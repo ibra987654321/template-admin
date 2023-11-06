@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
 
+import { authURL, baseURL } from '@/environments/environment'
 
-import { environment } from '@/environments/environment'
-import { setToken } from '@/helpers/helpers'
-import router from '@/router'
-
+// stores
+import settings from '@/views/Settings/store/index'
+import storage from '@/views/Storage/store/index'
+import branch from '@/views/Branches/store/index'
+import moment from 'moment'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -33,25 +34,25 @@ export default new Vuex.Store({
       state.snackbars.text = text
       state.snackbars.timeout = 3000
     },
+    setStartDay(state, val) {
+      state.start = new Date(moment().subtract(val, 'days').format().slice(0, 19))
+    },
   },
   actions: {
     login({ commit }, payload) {
-      // return axios(`${environment.authAPI}/login/auth`, {
-      //   method: 'POST',
-      //   data: {
-      //     ...payload,
-      //   },
-      // })
-      //   .then(res => {
-      //     if (res.data.token) {
-      //       setToken(res.data.token)
-      //       router.push({ name: 'dashboard' })
-      //     }
-      //   })
-      //   .catch(error => {
-      //     commit('setError', error.response.status)
-      //   })
-      router.push({ name: 'dashboard' })
+      return authURL.post('/storage/api/user/login', payload)
+    },
+    getDepartment(_, payload) {
+      return baseURL.get('/storage/api/settings/department/all/' + payload)
+    },
+    postDepartment(_, payload) {
+      return baseURL.post('/storage/api/settings/department/create', payload)
+    },
+    putDepartment(_, payload) {
+      return baseURL.put('/storage/api/settings/department/update', payload)
+    },
+    deleteDepartment(_, payload) {
+      return baseURL.delete(`/storage/api/settings/department/delete/${payload.id}`)
     },
   },
   getters: {
@@ -61,5 +62,8 @@ export default new Vuex.Store({
     },
   },
   modules: {
+    settings,
+    storage,
+    branch,
   },
 })

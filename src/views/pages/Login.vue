@@ -17,7 +17,7 @@
             ></v-img>
 
             <h2 class="text-2xl font-weight-semibold">
-              Rassrochka.kg
+              Система
             </h2>
           </router-link>
         </v-card-title>
@@ -25,7 +25,7 @@
         <!-- title -->
         <v-card-text>
           <p class="text-2xl font-weight-semibold text--primary mb-2">
-            Добро пожаловать в Rassrochka.kg! 👋🏻
+            Добро пожаловать в систему! 👋🏻
           </p>
           <p class="mb-2">
             Пожалуйста, войдите в свою учетную запись и начните приключение
@@ -61,7 +61,7 @@
               hide-details
               required
               :disabled="loading"
-              @keyup.enter="loader = 'loading'"
+              @keyup.enter="submit"
               @click:append="isPasswordVisible = !isPasswordVisible"
             ></v-text-field>
             <v-btn
@@ -69,7 +69,7 @@
               color="primary"
               class="mt-6"
               :loading="loading"
-              @click="loader = 'loading'"
+              @click="submit"
             >
               Войти
             </v-btn>
@@ -100,20 +100,20 @@
       height="289"
       src="@/assets/images/misc/tree-3.png"
     ></v-img>
-    <div class="text-center" v-if="$store.state.error">
+    <div class="text-center" v-if="$store.state.snackbars.snackbar">
 
       <v-snackbar
-        v-model="snackbar"
-        :timeout="timeout"
+        v-model="$store.state.snackbars.snackbar"
+        :timeout="$store.state.snackbars.timeout"
       >
-        {{ textNotification }}
+        {{ $store.state.snackbars.text }}
 
         <template v-slot:action="{ attrs }">
           <v-btn
             color="blue"
             text
             v-bind="attrs"
-            @click="snackbar = false"
+            @click="$store.state.snackbars.snackbar = false"
           >
             Закрыть
           </v-btn>
@@ -127,6 +127,8 @@
 import {
   mdiEyeOutline, mdiEyeOffOutline,
 } from '@mdi/js'
+import { setToken } from '@/helpers/helpers'
+import router from '@/router'
 
 export default {
   data: () => ({
@@ -154,7 +156,6 @@ export default {
     async loader() {
       const l = this.loader
       this[l] = !this[l]
-      // eslint-disable-next-line no-return-assign
       await this.submit()
 
       this.loader = null
@@ -162,7 +163,21 @@ export default {
   },
   methods: {
     submit() {
-      this.$store.dispatch('login')
+      this.loading = true
+      this.$store.dispatch('login', {username: this.email, password:this.password})
+        .then(res => {
+          if (res.data.token) {
+              this.loading = false
+            setToken(res.data.token)
+            this.$router.push({ name: 'storage' })
+          }
+        })
+        .catch(error => {
+          this.loading = false
+          if (error.response) {
+            this.$store.commit('setSnackbars', error.response.data)
+          }
+        })
     },
   },
 }

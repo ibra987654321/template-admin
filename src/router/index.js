@@ -16,12 +16,32 @@ const routes = [
     meta: { layout: 'main'},
     component: () => import('../views/dashboard/Dashboard'),
   },
-  // {
-  //   path: '/detail/:id',
-  //   name: 'detail',
-  //   meta: { layout: 'main', auth: true, authorize: [Role.User, Role.Admin] },
-  //   component: () => import('../components/Detail'),
-  // },
+  {
+    path: '/settings',
+    name: 'settings',
+    meta: { layout: 'main'},
+    component: () => import('../views/Settings/Settings'),
+  },
+  {
+    path: '/storage',
+    name: 'storage',
+    meta: { layout: 'main'},
+    component: () => import('../views/Storage/index'),
+  },
+  {
+  // , auth: true, authorize: [Role.User, Role.Admin]
+    path: '/detail/:id',
+    name: 'detail',
+    meta: { layout: 'main'},
+    component: () => import('@/views/Branches/index'),
+  },
+  {
+    // , auth: true, authorize: [Role.User, Role.Admin]
+    path: '/department-detail/:id',
+    name: 'department-detail',
+    meta: { layout: 'main'},
+    component: () => import('@/views/Department/index'),
+  },
   {
     path: '/pages/login',
     name: 'pages-login',

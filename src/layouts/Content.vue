@@ -12,7 +12,7 @@
         <div class="d-flex align-center mx-6">
           <!-- Left Content -->
           <v-app-bar-nav-icon
-            class="d-block d-lg-none me-2"
+            class=" ml-2"
             @click="isDrawerOpen = !isDrawerOpen"
           ></v-app-bar-nav-icon>
           <v-spacer></v-spacer>
@@ -33,10 +33,6 @@
 <script>
 import { ref } from '@vue/composition-api'
 import { mdiMagnify, mdiBellOutline, mdiGithub } from '@mdi/js'
-import {
-  getProfileId,
-  getStep,
-} from '@/helpers/helpers'
 import VerticalNavMenu from './components/vertical-nav-menu/VerticalNavMenu.vue'
 import ThemeSwitcher from './components/ThemeSwitcher.vue'
 import AppBarUserMenu from './components/AppBarUserMenu.vue'
@@ -59,8 +55,6 @@ export default {
       removeData,
       isDrawerOpen,
       repeat,
-      getStep,
-      // Icons
       icons: {
         mdiMagnify,
         mdiBellOutline,
@@ -83,7 +77,15 @@ export default {
     }
   }
 }
-
+//.theme--light.v-application {
+//  background-image: linear-gradient(to bottom ,#f4f5fa 3%, #fff 97%);
+//
+//}
+//.app-content-container {
+//  background-color: #fff;
+//  //border: 1px solid #000;
+//  border-radius: 20px;
+//}
 .boxed-container {
   max-width: 1440px;
   margin-left: auto;

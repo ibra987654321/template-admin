@@ -14,18 +14,9 @@
         to="/dashboard"
         class="d-flex align-center text-decoration-none"
       >
-        <v-img
-          :src="require('@/assets/images/logos/phone.jpg')"
-          max-height="30px"
-          max-width="30px"
-          alt="logo"
-          contain
-          eager
-          class="app-logo me-3"
-        ></v-img>
         <v-slide-x-transition>
           <h2 class="app-title text--primary">
-            Admin
+            Ariana LLC
           </h2>
         </v-slide-x-transition>
       </router-link>
@@ -39,15 +30,24 @@
     >
       <nav-menu-link
         title="Главная"
-        :to="{ name: 'dashboard' }"
+        :to="{ name: 'storage' }"
         :icon="icons.mdiHomeOutline"
       ></nav-menu-link>
+      <nav-menu-link
+        title="Настройки"
+        :to="{ name: 'settings' }"
+        :icon="icons.mdiBookSettings"
+      ></nav-menu-link>
+<!--      <nav-menu-link-->
+<!--        title="Склад"-->
+<!--        :to="{ name: 'storage' }"-->
+<!--        :icon="icons.mdiBookSettings"-->
+<!--      ></nav-menu-link>-->
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script>
-// eslint-disable-next-line object-curly-newline
 import {
   mdiHomeOutline,
   mdiAlphaTBoxOutline,
@@ -57,11 +57,13 @@ import {
   mdiFileOutline,
   mdiFormSelect,
   mdiAccountCogOutline,
+  mdiBookSettings
 } from '@mdi/js'
 import NavMenuSectionTitle from './components/NavMenuSectionTitle.vue'
 import NavMenuGroup from './components/NavMenuGroup.vue'
 import NavMenuLink from './components/NavMenuLink.vue'
 import {decodeJWT} from "@/helpers/auth";
+import { getToken } from '@/helpers/helpers'
 
 export default {
   components: {
@@ -86,6 +88,7 @@ export default {
         mdiFileOutline,
         mdiFormSelect,
         mdiAccountCogOutline,
+        mdiBookSettings,
       },
     }
   },

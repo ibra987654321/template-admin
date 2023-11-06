@@ -10,8 +10,9 @@ import { computed } from '@vue/composition-api'
 import { useRouter } from '@/utils'
 import LayoutBlank from '@/layouts/Blank.vue'
 import LayoutContent from '@/layouts/Content.vue'
-import {getDarkTheme} from '@/helpers/helpers'
-import TheSnackbars from "@/components/TheSnackbars";
+import { getDarkTheme } from '@/helpers/helpers'
+// eslint-disable-next-line import/extensions
+import TheSnackbars from '@/components/TheSnackbars'
 
 export default {
   components: {
@@ -33,7 +34,6 @@ export default {
     const { route } = useRouter()
 
     const resolveLayout = computed(() => {
-      // Handles initial route
       if (route.value.name === null) return null
 
       if (route.value.meta.layout === 'blank') return 'layout-blank'
