@@ -15,44 +15,47 @@
       src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
     ></v-img>
 
-    <v-card-title>{{ $props.item.name }}</v-card-title>
+    <v-card-title>
+      {{ $props.item.name }}
+      <v-btn small class="ml-2" color="info" @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
+    </v-card-title>
 
     <v-card-text>
-      <v-row
-        align="center"
-        class="mx-0"
-      >
-        <v-rating
-          :value="4.5"
-          color="amber"
-          dense
-          half-increments
-          readonly
-          size="14"
-        ></v-rating>
+<!--      <v-row-->
+<!--        align="center"-->
+<!--        class="mx-0"-->
+<!--      >-->
+<!--        <v-rating-->
+<!--          :value="4.5"-->
+<!--          color="amber"-->
+<!--          dense-->
+<!--          half-increments-->
+<!--          readonly-->
+<!--          size="14"-->
+<!--        ></v-rating>-->
 
-        <div class="grey--text ms-4">
-          3000 гр Клубники
-        </div>
-      </v-row>
+<!--        <div class="grey&#45;&#45;text ms-4">-->
+<!--          3000 гр Клубники-->
+<!--        </div>-->
+<!--      </v-row>-->
 
-      <div class="my-4 text-subtitle-1">
-        $ • {{ $props.item.id }}
-      </div>
+<!--      <div class="my-4 text-subtitle-1">-->
+<!--        $ • {{ $props.item.id }}-->
+<!--      </div>-->
 
-      <div>Small plates, salads & sandwiches - an intimate setting with 12 indoor seats plus patio seating.</div>
+<!--      <div>Small plates, salads & sandwiches - an intimate setting with 12 indoor seats plus patio seating.</div>-->
     </v-card-text>
 
     <v-divider class="mx-4"></v-divider>
 
-    <v-card-title>125 шт цветов</v-card-title>
+<!--    <v-card-title>125 шт цветов</v-card-title>-->
 
     <v-card-text>
       <v-chip-group
         active-class="deep-purple accent-4 white--text"
         column
       >
-        <v-chip v-for="product in goods">{{product.name}} : {{product.amount}}</v-chip>
+        <v-chip x-large v-for="product in goods">{{product.name}} : {{product.amount}}</v-chip>
       </v-chip-group>
     </v-card-text>
     <v-card-text >
@@ -91,7 +94,7 @@
           </v-card>
         </template>
       </v-dialog>
-      <v-btn small class="mt-2 ml-1" color="info" @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
+
     </v-card-text>
   </v-card>
 </template>

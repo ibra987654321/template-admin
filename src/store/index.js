@@ -7,6 +7,7 @@ import { authURL, baseURL } from '@/environments/environment'
 import settings from '@/views/Settings/store/index'
 import storage from '@/views/Storage/store/index'
 import branch from '@/views/Branches/store/index'
+import department from '@/views/Department/store'
 import moment from 'moment'
 Vue.use(Vuex)
 
@@ -65,5 +66,6 @@ export default new Vuex.Store({
     settings,
     storage,
     branch,
+    department,
   },
 })
