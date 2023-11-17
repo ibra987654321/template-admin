@@ -1,9 +1,10 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <createDialog @success="listOfData"/>
+      <v-btn @click="$router.go(-1)" class="mr-2" small><v-icon>{{icons.mdiArrowLeft}}</v-icon></v-btn>
+<!--      <createDialog @success="listOfData"/>-->
     </v-col>
-    <v-col cols="4" v-for="item in items">
+    <v-col :cols="$vuetify.breakpoint.sm ? 6 : 4" v-for="item in items">
       <branchItem :item="item" @successDelete="listOfData" @successUpdate="listOfData()"/>
     </v-col>
 <!--    <v-col cols="8">-->
@@ -18,6 +19,7 @@ import branchItem from '@/views/Branches/components/branchItem'
 import workshops from '@/views/Workshops/index'
 import stores from '@/views/Stores/index'
 import createDialog from '@/views/Branches/components/createDialog'
+import {mdiArrowLeft} from '@mdi/js'
 export default {
   name: 'index',
   components: {
@@ -27,7 +29,8 @@ export default {
     createDialog,
   },
   data:() => ({
-    items: []
+    items: [],
+    icons: {mdiArrowLeft}
   }),
   mounted() {
     this.listOfData()
@@ -39,8 +42,10 @@ export default {
          this.items = r.data
         })
         .catch(e => this.$store.commit('setSnackbars', e.message))
-    }
-  }
+    },
+
+  },
+
 }
 </script>
 

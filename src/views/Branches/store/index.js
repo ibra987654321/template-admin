@@ -6,11 +6,11 @@ export default {
     getAllGoodsInDepartment(_, payload) {
       return baseURL.get('/storage/api/goods/all/' + payload)
     },
-    saveToDepartment(_, payload) {
-      return baseURL.post('/storage/api/goods/saveToDepartment/' + payload.to, payload)
+    saveToBranch(_, payload) {
+      return baseURL.post('/storage/api/goods/saveToBranch/' + payload.from, payload)
     },
-    moveToDepartment(_, payload) {
-      return baseURL.post(`/storage/api/goods/moveToDepartment/${payload.from}/${payload.to}`, payload)
+    moveToBranch(_, payload) {
+      return baseURL.post(`/storage/api/goods/moveToBranch/${payload.from}/${payload.to}`, payload)
     },
     currentAmountByGoods(_, payload) {
       return baseURL.post(`/storage/api/goods/currentAmountByGoods/${payload}`)

@@ -1,22 +1,37 @@
 <template>
   <v-row dense>
-    <v-col v-for="item in branches" cols>
+    <v-col v-for="item in branches">
       <v-card
-        elevation="5"
+        class="mx-auto d-flex flex-column justify-space-between elevation-2"
+        max-width="344"
         style="height: 100%;"
+        outlined
       >
-        <v-card-title class="text-h5">
-          {{item.name}}
-        </v-card-title>
+        <v-list-item three-line>
+          <v-list-item-content>
+            <div class="text-overline mb-4">
+              Филиал
+            </div>
+            <v-list-item-title class="text-h5 mb-1">
+              {{item.name}}
+            </v-list-item-title>
+            <v-list-item-subtitle style="min-width: 130px" v-for="good in item.goods">
+              {{good.name}} : {{good.amount}}
+            </v-list-item-subtitle>
+          </v-list-item-content>
 
-        <v-card-subtitle v-for="good in item.goods">{{good.name}} : {{good.amount}}</v-card-subtitle>
+          <v-list-item-avatar
+            tile
+            size="80"
+            color="grey"
+          ></v-list-item-avatar>
+        </v-list-item>
 
         <v-card-actions>
           <v-btn
-            class="ml-2 mt-5"
             outlined
             rounded
-            small
+            text
             @click="$router.push({path: `detail/${item.id}`})"
           >
             Подробнее
@@ -28,17 +43,39 @@
 </template>
 
 <script>
+import { getToken } from '@/helpers/helpers'
+
 export default {
   name: 'branchs',
   data:() => ({
     branches: []
   }),
   mounted() {
-    this.$store.dispatch('getAllBranch')
-      .then(r => {
-        this.branches = r.data
-      })
-      .catch(e => this.$store.commit('setSnackbars', e.message))
+    this.initEventSource()
+  },
+  methods: {
+    initEventSource() {
+      this.eventSource = new EventSource(`http://176.126.164.208:8070/storage/api/settings/branch/all/goods/byFlux?token=${getToken()}`);
+
+      // Обработчик открытия соединения
+      this.eventSource.onopen = () => {
+      };
+
+      // Обработчик получения сообщения
+      this.eventSource.onmessage = (event) => {
+        this.branches = JSON.parse(event.data)
+      };
+
+    },
+    disconnectEventSource() {
+      // Закрытие соединения
+      if (this.eventSource) {
+        this.eventSource.close();
+      }
+    },
+  },
+  destroyed() {
+    this.disconnectEventSource()
   }
 }
 </script>

@@ -12,44 +12,17 @@
 
     <v-img
       height="250"
-      src="https://cdn.vuetifyjs.com/images/cards/cooking.png"
+      :src="$props.item.type === 'SHOP' ? 'https://images.unsplash.com/photo-1525640788966-69bdb028aa73?q=80&w=3867&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' : 'https://cdn.vuetifyjs.com/images/cards/cooking.png'"
     ></v-img>
 
     <v-card-title>
       {{ $props.item.name }}
-      <v-btn small class="ml-2" color="info" @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
     </v-card-title>
 
     <v-card-text>
-<!--      <v-row-->
-<!--        align="center"-->
-<!--        class="mx-0"-->
-<!--      >-->
-<!--        <v-rating-->
-<!--          :value="4.5"-->
-<!--          color="amber"-->
-<!--          dense-->
-<!--          half-increments-->
-<!--          readonly-->
-<!--          size="14"-->
-<!--        ></v-rating>-->
-
-<!--        <div class="grey&#45;&#45;text ms-4">-->
-<!--          3000 гр Клубники-->
-<!--        </div>-->
-<!--      </v-row>-->
-
-<!--      <div class="my-4 text-subtitle-1">-->
-<!--        $ • {{ $props.item.id }}-->
-<!--      </div>-->
-
-<!--      <div>Small plates, salads & sandwiches - an intimate setting with 12 indoor seats plus patio seating.</div>-->
     </v-card-text>
 
     <v-divider class="mx-4"></v-divider>
-
-<!--    <v-card-title>125 шт цветов</v-card-title>-->
-
     <v-card-text>
       <v-chip-group
         active-class="deep-purple accent-4 white--text"
@@ -60,19 +33,11 @@
     </v-card-text>
     <v-card-text >
       <updateDialog  :item="item" @success="$emit('successUpdate')"/>
-      <moveToDepartment :prop-item="item" @success="listOfGoods()"/>
       <v-dialog
         transition="dialog-bottom-transition"
         max-width="600"
       >
         <template v-slot:activator="{ on, attrs }">
-          <v-btn
-            color="error"
-            v-bind="attrs"
-            v-on="on"
-            small
-            class="mt-2"
-          >Удалить</v-btn>
         </template>
         <template v-slot:default="dialog">
           <v-card>
@@ -101,12 +66,11 @@
 
 <script>
 import updateDialog from '@/views/Branches/components/updateDialog'
-import moveToDepartment from '@/views/Storage/components/moveToDepartment'
+import { getToken } from '@/helpers/helpers'
 export default {
   name: 'branchItem',
   components: {
     updateDialog,
-    moveToDepartment,
   },
   props: {
     item: Object
@@ -115,7 +79,7 @@ export default {
     goods: []
   }),
   mounted() {
-    this.listOfGoods()
+    this.initEventSource()
   },
   methods: {
     deleteItem() {
@@ -124,12 +88,35 @@ export default {
         .catch(e => this.$store.commit('setSnackbars', e.message))
     },
     listOfGoods() {
-      this.$store.dispatch('currentAmountByGoods', this.item.id)
-        .then(r => {
-          this.goods = r.data
-        })
-        .catch(e => this.$store.commit('setSnackbars', e.message))
-    }
+      // this.$store.dispatch('currentAmountByGoods', this.item.id)
+      //   .then(r => {
+      //     this.goods = r.data
+      //   })
+      //   .catch(e => this.$store.commit('setSnackbars', e.message))
+
+    },
+    initEventSource() {
+      this.eventSource = new EventSource(`http://176.126.164.208:8070/storage/api/goods/currentAmountByGoodsbyFlux/${this.item.id}?token=${getToken()}`);
+
+      // Обработчик открытия соединения
+      this.eventSource.onopen = () => {
+      };
+
+      // Обработчик получения сообщения
+      this.eventSource.onmessage = (event) => {
+        this.goods = JSON.parse(event.data)
+      };
+
+    },
+    disconnectEventSource() {
+      // Закрытие соединения
+      if (this.eventSource) {
+        this.eventSource.close();
+      }
+    },
+  },
+  destroyed() {
+    this.disconnectEventSource()
   }
 }
 </script>

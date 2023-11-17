@@ -11,18 +11,19 @@
          v-for="(n, number) in items"
          :key="number"
        >
-         {{ n.title }}
-<!--         <v-btn-->
-<!--           depressed-->
-<!--           color="primary"-->
-<!--         >{{ n.title }}</v-btn>-->
+<!--         {{ n.title }}-->
+         <v-btn
+           depressed
+           color="primary"
+         >{{ n.title }}</v-btn>
        </v-tab>
      </v-tabs>
-     <v-tabs-items v-model="tabs" class="mt-4 transparent" >
+     <v-tabs-items v-model="tabs" class="py-7 transparent" >
        <v-tab-item >
          <div class="text-h5 text-center mb-5">Склад</div>
          <products></products>
          <hr class="my-10" color="#c48eff">
+         <moveEachBranch />
          <branchs></branchs>
        </v-tab-item>
        <v-tab-item>
@@ -37,12 +38,14 @@
 import loggers from '@/views/Storage/components/loggers'
 import products from '@/views/Storage/components/products'
 import branchs from '@/views/Storage/components/branchs'
+import moveEachBranch from '@/views/Storage/components/moveEachBranch'
 export default {
   name: 'index',
   components: {
     products,
     loggers,
-    branchs
+    branchs,
+    moveEachBranch
   },
   data:() => ({
     tabs: null,

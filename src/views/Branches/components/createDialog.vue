@@ -9,7 +9,7 @@
         color="primary"
         v-bind="attrs"
         v-on="on"
-        x-large
+
       >Добавить объект</v-btn>
     </template>
     <template v-slot:default="dialog">

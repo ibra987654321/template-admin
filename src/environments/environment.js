@@ -4,33 +4,49 @@ import { getToken } from '@/helpers/helpers'
 
 
 export const authURL = axios.create({
-  baseURL: 'http://sks-back.beeline.kg:8070',
+  baseURL: 'http://176.126.164.208:8070',
 })
 
 export const baseURL = axios.create({
-  baseURL: 'http://sks-back.beeline.kg:8070',
-  timeout: 5000,
+  baseURL: 'http://176.126.164.208:8070',
   headers: {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${getToken()}`,
   }
 })
 
-export function createAxiosInstance() {
-  const instance = axios.create({
-    baseURL: 'http://sks-back.beeline.kg:8070',
-    timeout: 5000,
-    headers: {
-      'Content-Type': 'application/json',
+baseURL.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  });
-
-  // Динамически устанавливаем заголовок "Authorization" при каждом запросе
-  instance.interceptors.request.use((config) => {
-    const token = getToken(); // Получаем токен здесь, перед каждым запросом
-    config.headers.Authorization = `Bearer ${token}`;
     return config;
-  });
-  console.log(instance)
-  return instance;
-}
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+export const imageURL = axios.create({
+  baseURL: 'http://176.126.164.208:8070',
+  timeout: 5000,
+  headers: {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${getToken()}`,
+  },
+  responseType: 'arraybuffer',
+})
+
+imageURL.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);

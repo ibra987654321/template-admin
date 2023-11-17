@@ -12,6 +12,7 @@ export default {
       return baseURL.get('/storage/api/settings/branch/all/goods')
     },
     postAllBranch(_, payload) {
+      delete payload.id
       return baseURL.post('/storage/api/settings/branch/create', payload)
     },
     putAllBranch(_, payload) {

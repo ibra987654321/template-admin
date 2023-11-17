@@ -10,9 +10,9 @@ export default {
     arrivalOfGoods(_, payload) {
       return baseURL.post('/storage/api/saveToStorage', payload)
     },
-    moveToBranch(_, payload) {
-      return baseURL.post(`/storage/api/moveToBranch/${payload.id}`, payload)
-    },
+    // moveToBranch(_, payload) {
+    //   return baseURL.post(`/storage/api/moveToBranch/${payload.id}`, payload)
+    // },
     loggerToBranch(state) {
       state.commit('setStartDay', 30)
       const data = {

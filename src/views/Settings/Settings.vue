@@ -7,7 +7,7 @@
           :headers="headers"
           :edited-items="editedItem"
           :show-to-edit="showToEdit"
-          get-dispatch="getAllBranch"
+          get-dispatch="allBranchesWithDepartments"
           put-dispatch="putAllBranch"
           post-dispatch="postAllBranch"
           delete-dispatch="deleteAllBranch"
