@@ -57,6 +57,17 @@
           </div>
           <div class="mt-4">
             <v-select
+              v-model="categoryM"
+              label="Товар"
+              :items="category"
+              item-value="id"
+              item-text="name"
+              hide-details
+              dense
+              outlined
+              class="mb-2"
+            ></v-select>
+            <v-select
               v-model="item.productId"
               label="Товар"
               :items="products"
@@ -72,7 +83,7 @@
               outlined
               type="number"
               hide-details
-              label="Количество"
+              :label="unitOfMeasurement"
               dense
             ></v-text-field>
           </div>
@@ -128,8 +139,11 @@ export default {
   data:() => ({
     dialog: false,
     move: null,
+    unitOfMeasurement: null,
+    categoryM: null,
     items: [],
     products: [],
+    category: [],
     secondItem: [],
     item: {
       "productId": '',
@@ -145,9 +159,10 @@ export default {
         this.items = r.data
       })
       .catch(e => this.$store.commit('setSnackbars', e.message))
-    this.$store.dispatch('getProduct')
+    this.$store.dispatch('getCategory')
       .then(r => {
-        this.products = r.data
+        this.category = r.data
+        this.categoryM = 1
       })
       .catch(e => this.$store.commit('setSnackbars', e.message))
   },
@@ -156,6 +171,16 @@ export default {
       this.secondItem = this.items.filter(function(item) {
         return item.id !== v;
       });
+    },
+    categoryM(v) {
+      this.$store.dispatch('getProduct', v)
+        .then(r => {
+          this.products = r.data
+        })
+        .catch(e => this.$store.commit('setSnackbars', e.message))
+    },
+    'item.productId'(v) {
+      this.unitOfMeasurement = this.products.find(i => i.id === v).unitOfMeasurement
     }
   },
   computed: {

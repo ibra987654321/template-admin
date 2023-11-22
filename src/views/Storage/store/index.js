@@ -10,6 +10,9 @@ export default {
     arrivalOfGoods(_, payload) {
       return baseURL.post('/storage/api/saveToStorage', payload)
     },
+    getSetsForBranch(_, payload) {
+      return baseURL.post('/storage/api/set/allnameAmount/' + payload )
+    },
     // moveToBranch(_, payload) {
     //   return baseURL.post(`/storage/api/moveToBranch/${payload.id}`, payload)
     // },

@@ -856,7 +856,7 @@ export default {
       if (this.$props.childTable) {
         this.$store.dispatch(this.$props.childTable.actions.getDispatch, item.id)
           .then(r => {
-            this.childTableData = r
+            this.childTableData = r.data
           })
       }
       this.editedIndex = this.itemsWithIndex.indexOf(item)

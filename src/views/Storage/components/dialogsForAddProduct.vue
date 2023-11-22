@@ -17,6 +17,16 @@
         <v-card-title class="mb-8" >Добавление товара в склад</v-card-title>
         <v-card-text class="d-flex justify-space-around">
           <v-select
+            v-model="categoryM"
+            label="Товар"
+            :items="category"
+            item-value="id"
+            item-text="name"
+            hide-details
+            outlined
+            class="mr-2"
+          ></v-select>
+          <v-select
             v-model="item.productId"
             label="Товар"
             :items="items"
@@ -30,7 +40,7 @@
             v-model="item.amount"
             outlined
             type="number"
-            label="Количество"
+            :label="unitOfMeasurement"
           ></v-text-field>
         </v-card-text>
         <v-card-actions class="justify-space-between">
@@ -54,22 +64,38 @@ export default {
   name: 'dialogsForAddProduct',
   data:() => ({
     dialog: false,
+    categoryM: null,
+    unitOfMeasurement: null,
     item: {
       "productId": null,
       "amount": null
     },
-    items: []
+    items: [],
+    category: [],
   }),
   mounted() {
-    this.$store.dispatch('getProduct')
+    this.$store.dispatch('getCategory')
       .then(r => {
-        this.items = r.data
+        this.category = r.data
+        this.categoryM = 1
       })
       .catch(e => this.$store.commit('setSnackbars', e.message))
   },
   computed: {
     valid() {
       return !!(this.item.amount && this.item.productId);
+    }
+  },
+  watch: {
+    categoryM(v) {
+      this.$store.dispatch('getProduct', v)
+        .then(r => {
+          this.items = r.data
+        })
+        .catch(e => this.$store.commit('setSnackbars', e.message))
+    },
+    'item.productId'(v) {
+      this.unitOfMeasurement = this.items.find(i => i.id === v).unitOfMeasurement
     }
   },
   methods: {

@@ -13,7 +13,8 @@ export default {
     },
     postAllBranch(_, payload) {
       delete payload.id
-      return baseURL.post('/storage/api/settings/branch/create', payload)
+      return baseURL.post('/storage/api/settings/branch/departments/create', payload)
+      // return baseURL.post('/storage/api/settings/branch/create', payload)
     },
     putAllBranch(_, payload) {
       return baseURL.put('/storage/api/settings/branch/update', payload)
@@ -39,8 +40,8 @@ export default {
 
     // product-controller
 
-    getProduct() {
-      return baseURL.get('/storage/api/settings/product/all')
+    getProduct(_, payload) {
+      return baseURL.get('/storage/api/settings/product/all/' + payload)
     },
     postProduct(_, payload) {
       return baseURL.post('/storage/api/settings/product/create', payload)
@@ -62,6 +63,21 @@ export default {
     },
     createUser(_, payload) {
       return baseURL.post('/storage/api/admin/create', payload)
+    },
+
+    // category-controller
+
+    getCategory() {
+      return baseURL.get('/storage/api/settings/category/all')
+    },
+    postCategory(_, payload) {
+      return baseURL.post('/storage/api/settings/category/create', payload)
+    },
+    putCategory(_, payload) {
+      return baseURL.put('/storage/api/settings/category/update', payload)
+    },
+    deleteCategory(_, payload) {
+      return baseURL.delete(`/storage/api/settings/category/delete/${payload.id}`)
     },
   },
   mutations: {},

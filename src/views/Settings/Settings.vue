@@ -28,15 +28,28 @@
       <v-col cols="6">
         <use-table
           title="Продукты"
-          :headers="product.headers"
-          :edited-items="product.editedItem"
-          :show-to-edit="product.showToEdit"
-          get-dispatch="getProduct"
-          put-dispatch="putProduct"
-          post-dispatch="postProduct"
-          delete-dispatch="deleteProduct"
+          :headers="category.headers"
+          :edited-items="category.editedItem"
+          :show-to-edit="category.showToEdit"
+          :child-table="product"
+          get-dispatch="getCategory"
+          put-dispatch="putCategory"
+          post-dispatch="postCategory"
+          delete-dispatch="deleteCategory"
         ></use-table>
       </v-col>
+<!--      <v-col cols="6">-->
+<!--        <use-table-->
+<!--          title="Продукты"-->
+<!--          :headers="product.headers"-->
+<!--          :edited-items="product.editedItem"-->
+<!--          :show-to-edit="product.showToEdit"-->
+<!--          get-dispatch="getProduct"-->
+<!--          put-dispatch="putProduct"-->
+<!--          post-dispatch="postProduct"-->
+<!--          delete-dispatch="deleteProduct"-->
+<!--        ></use-table>-->
+<!--      </v-col>-->
       <v-col cols="6">
         <createUser/>
       </v-col>
@@ -68,7 +81,7 @@ export default {
       {type: 'input', col: 12, value: 'name',label: 'Название' }
     ],
     product: {
-      headers: [
+      header: [
         {value: 'index', text: '#' },
         {value: 'name', text: 'Название'},
         {value: 'unitOfMeasurement', text: 'Ед измерение'},
@@ -77,11 +90,35 @@ export default {
       editedItem: {
         id: 0,
         name: '',
-        unitOfMeasurement: ''
+        unitOfMeasurement: '',
+        categoryId: ''
       },
       showToEdit: [
         {type: 'input', col: 6, value: 'name',label: 'Название' },
         {type: 'input', col: 6, value: 'unitOfMeasurement',label: 'Ед измерение' }
+      ],
+      actions: {
+        getDispatch: "getProduct",
+        putDispatch: "putProduct",
+        postDispatch: "postProduct",
+        deleteDispatch: "deleteProduct",
+      }
+    },
+    category: {
+      headers: [
+        {value: 'index', text: '#' },
+        {value: 'name', text: 'Название'},
+        {value: 'type', text: 'Тип'},
+        {value: 'actions', text: 'Действие'},
+      ],
+      editedItem: {
+        id: 0,
+        name: '',
+        type: ''
+      },
+      showToEdit: [
+        {type: 'input', col: 6, value: 'name',label: 'Название' },
+        {type: 'input', col: 6, value: 'type',label: 'Тип' }
       ],
     }
   })

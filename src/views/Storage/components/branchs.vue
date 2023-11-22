@@ -18,6 +18,10 @@
             <v-list-item-subtitle style="min-width: 130px" v-for="good in item.goods">
               {{good.name}} : {{good.amount}}
             </v-list-item-subtitle>
+<!--            {{getSets(item.id)}}-->
+<!--            <v-list-item-subtitle v-if="sets.length" style="min-width: 130px" v-for="good in sets">-->
+<!--              {{good.name}} : {{good.amount}}-->
+<!--            </v-list-item-subtitle>-->
           </v-list-item-content>
 
           <v-list-item-avatar
@@ -44,33 +48,40 @@
 
 <script>
 import { getToken } from '@/helpers/helpers'
-
+import { environment, SETTING, STORAGE } from '@/environments/endPoint'
 export default {
   name: 'branchs',
   data:() => ({
-    branches: []
+    branches: [],
+    sets: [],
+    // eventSource: {
+    //   goods: '',
+    //   sets: ''
+    // }
   }),
   mounted() {
     this.initEventSource()
   },
   methods: {
-    initEventSource() {
-      this.eventSource = new EventSource(`http://176.126.164.208:8070/storage/api/settings/branch/all/goods/byFlux?token=${getToken()}`);
-
-      // Обработчик открытия соединения
-      this.eventSource.onopen = () => {
+    getSets(v) {
+      this.eventSource1 = new EventSource(`${environment.main }${STORAGE}/set/allnameAmount/${v}?token=${getToken()}`);
+      this.eventSource1.onmessage = (event) => {
+        this.sets = JSON.parse(event.data)
       };
-
-      // Обработчик получения сообщения
+    },
+    initEventSource() {
+      this.eventSource = new EventSource(`${environment.main }${SETTING}/branch/all/goods/byFlux?token=${getToken()}`);
       this.eventSource.onmessage = (event) => {
         this.branches = JSON.parse(event.data)
       };
-
     },
     disconnectEventSource() {
       // Закрытие соединения
       if (this.eventSource) {
         this.eventSource.close();
+      }
+      if (this.eventSource1) {
+        this.eventSource1.close();
       }
     },
   },

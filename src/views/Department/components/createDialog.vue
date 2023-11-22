@@ -1,7 +1,7 @@
 <template>
   <v-dialog
     transition="dialog-bottom-transition"
-    max-width="600"
+    max-width="700"
     v-model="dialog"
   >
     <template v-slot:activator="{ on, attrs }">
@@ -24,11 +24,24 @@
               ></v-text-field>
             </v-col>
             <v-col cols="6">
-              <v-text-field
+              <v-select
                 v-model="item.status"
                 outlined
+                :items="['Свободный', 'Заказ']"
                 label="Статус"
-              ></v-text-field>
+              ></v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="categoryM"
+                label="Товар"
+                :items="category"
+                item-value="id"
+                item-text="name"
+                hide-details
+                outlined
+                class="mr-2"
+              ></v-select>
             </v-col>
             <v-col cols="6">
               <v-select
@@ -47,20 +60,45 @@
                 v-model="item.amount"
                 outlined
                 type="number"
-                label="Количество"
+                :label="unitOfMeasurement"
               ></v-text-field>
             </v-col>
             <v-col cols="6">
-<!--              <v-file-input-->
-<!--                v-model="newMessage.file"-->
-<!--                accept="image/*"-->
-<!--                @change="handleFileChange"-->
-<!--                show-size-->
-<!--                show-overflow-->
-<!--                label="Выбрать изображение"-->
-<!--              ></v-file-input>-->
               <input type="file" @change="handleFileChange" accept="image/*" />
             </v-col>
+
+            <v-divider></v-divider>
+            <div class="text-sm-h5 mx-auto">Расходные материалы</div>
+            <v-col cols="12">
+              <v-row v-for="(material, idx) in item.consumables">
+                <v-col cols="7">
+                  <v-select
+                    v-model="material.materialId"
+                    label="Товар"
+                    :items="materials"
+                    item-value="id"
+                    item-text="name"
+                    hide-details
+                    outlined
+                    class="mr-2"
+                  ></v-select>
+                </v-col>
+                <v-col cols="3">
+                  <v-text-field
+                    v-model="material.amount"
+                    outlined
+                    label="Количество"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="2">
+                  <v-btn color="primary" @click="item.consumables.splice(idx, 1)">-</v-btn>
+                </v-col>
+              </v-row>
+              <v-col cols="12">
+              <v-btn color="primary" @click="item.consumables.push( { materialId: 0, amount: null })">+</v-btn>
+            </v-col>
+            </v-col>
+
           </v-row>
 
         </v-card-text>
@@ -72,6 +110,7 @@
           <v-btn
             color="primary"
             @click="save"
+            :loading="loading"
             :disabled="!valid"
           >Создать</v-btn>
         </v-card-actions>
@@ -90,25 +129,36 @@ export default {
   data:() => ({
     dialog: false,
     loading: false,
+    categoryM: null,
+    unitOfMeasurement: null,
     item: {
       "name": "",
       "status": "",
       "productId": 0,
-      "departmentId": 0,
-      "amount": null
+      "branchId": 0,
+      "amount": null,
+      "consumables": []
     },
     cameraNotSupported: false,
     newMessage: {
       file: null
     },
     items: [],
+    category: [],
     capturedPhoto: null,
     photoFile: null,
+    materials: null,
   }),
   mounted() {
-    this.$store.dispatch('getProduct')
+    this.$store.dispatch('getCategory')
       .then(r => {
-        this.items = r.data
+        this.category = r.data
+        this.categoryM = 1
+      })
+      .catch(e => this.$store.commit('setSnackbars', e.message))
+    this.$store.dispatch('getMaterial')
+      .then(r => {
+        this.materials = r.data
       })
       .catch(e => this.$store.commit('setSnackbars', e.message))
   },
@@ -116,7 +166,6 @@ export default {
     valid() {
       return !!(this.item.name && this.item.status && this.item.amount && this.item.productId);
     },
-
   },
   watch: {
     'dialog'(v) {
@@ -125,12 +174,22 @@ export default {
         this.item.productId = this.propItem.goods.product.id
         this.item.amount = this.propItem.amount
       }
+    },
+    categoryM(v) {
+      this.$store.dispatch('getProduct', v)
+        .then(r => {
+          this.items = r.data
+        })
+        .catch(e => this.$store.commit('setSnackbars', e.message))
+    },
+    'item.productId'(v) {
+      this.unitOfMeasurement = this.items.find(i => i.id === v).unitOfMeasurement
     }
   },
   methods: {
     save() {
       this.loading = true
-      this.item.departmentId = this.$route.params.id
+      this.item.branchId = this.$route.params.id
       if (this.propItem) {
         if (this.newMessage.file !== null) {
           this.$store.dispatch('uploadImg',{
@@ -143,8 +202,8 @@ export default {
                 "name": "",
                 "status": "",
                 "productId": 0,
-                "departmentId": 0,
-                "amount": 0
+                "branchId": 0,
+                "amount": null
               }
               this.dialog = false
               this.loading = false
@@ -168,7 +227,7 @@ export default {
                     "status": "",
                     "productId": 0,
                     "departmentId": 0,
-                    "amount": 0
+                    "amount": null
                   }
                   this.dialog = false
                   this.loading = false
@@ -187,40 +246,6 @@ export default {
       }
 
     },
-    capturePhoto() {
-      // Получение доступа к камере
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          // Отображение видеопотока в video элементе (если необходимо)
-          const video = document.createElement("video");
-          video.srcObject = stream;
-          document.body.appendChild(video);
-
-          // Захват кадра
-          const canvas = document.createElement("canvas");
-          const context = canvas.getContext("2d");
-
-          video.addEventListener("loadeddata", () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Преобразование кадра в base64 строку
-            this.photoFile = canvas.toDataURL("image/png");
-
-            // Остановка потока
-            stream.getTracks().forEach((track) => track.stop());
-
-            // Удаление элементов
-            document.body.removeChild(video);
-            document.body.removeChild(canvas);
-          });
-        })
-        .catch((error) => {
-          console.error("Ошибка при получении доступа к камере:", error);
-        });
-    },
     handleFileChange(event) {
       const file = event.target.files[0];
       if (file) {
@@ -230,15 +255,6 @@ export default {
           this.capturedPhoto = reader.result;
         };
         reader.readAsDataURL(file);
-      }
-    },
-    uploadPhoto() {
-      if (this.photoFile) {
-        // Отправка файла на бэкенд
-        const formData = new FormData();
-        formData.append("multipartFile", this.photoFile);
-
-        console.log(formData)
       }
     },
   },

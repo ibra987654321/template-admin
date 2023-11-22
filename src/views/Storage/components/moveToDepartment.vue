@@ -127,11 +127,11 @@ export default {
         this.renameKeys(this.items)
       })
       .catch(e => this.$store.commit('setSnackbars', e.message))
-    this.$store.dispatch('getProduct')
-      .then(r => {
-        this.products = r.data
-      })
-      .catch(e => this.$store.commit('setSnackbars', e.message))
+    // this.$store.dispatch('getProduct')
+    //   .then(r => {
+    //     this.products = r.data
+    //   })
+    //   .catch(e => this.$store.commit('setSnackbars', e.message))
   },
   computed: {
     valid() {

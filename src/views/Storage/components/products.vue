@@ -1,9 +1,17 @@
 <template>
 <div class="d-flex justify-space-around align-center">
   <dialogs-for-add-product @success="loadData()"></dialogs-for-add-product>
-  <v-card elevation="5" v-for="item in listOfData" class="d-flex justify-center flex-column align-center">
-    <v-card-title>{{item.name}}</v-card-title>
-    <v-card-title>{{item.amount}}</v-card-title>
+
+  <v-card class=" elevation-9" max-width="400" v-for="item in listOfData">
+    <v-card-title class="headline">{{ item.name }}</v-card-title>
+    <v-card-subtitle>{{ item.amount }}</v-card-subtitle>
+
+    <v-divider></v-divider>
+
+<!--    <v-card-actions>-->
+<!--      <v-btn text color="primary">Action 1</v-btn>-->
+<!--      <v-btn text color="primary">Action 2</v-btn>-->
+<!--    </v-card-actions>-->
   </v-card>
 </div>
 </template>
