@@ -3,14 +3,14 @@
     <div class="mb-5">
       <v-btn @click="$router.go(-1)" class="mr-2" small><v-icon>{{icons.mdiArrowLeft}}</v-icon></v-btn>
 
-      <createDialog text-btn="Собрать набор" @success="listOfData"/>
     </div>
     <div class="mt-2 d-flex flex-wrap">
 
       <v-hover v-slot="{ hover }" v-for="item in items">
         <v-card
-          class=" flex-grow-1 mr-4 mb-4"
-          :max-width="$vuetify.breakpoint.sm ? 233 : 280"
+          :loading="loading"
+          class=" flex-grow-2 mr-4 mb-4"
+          :max-width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
 
         >
           <v-img
@@ -18,7 +18,12 @@
             :src="imagesSrc.find(i => i.id === item.id).img"
             height="200px"
           ></v-img>
-          <v-fab-transition>
+          <v-skeleton-loader
+            v-else
+            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+            type="card-avatar"
+          ></v-skeleton-loader>
+          <v-fab-transition v-if="!loading">
             <v-btn
               v-show="hover"
               color="pink"
@@ -33,21 +38,60 @@
               <v-icon>{{ icons.mdiDeleteCircle }}</v-icon>
             </v-btn>
           </v-fab-transition>
+          <v-card-text class="mt-4" v-if="!loading">
+            <div class="d-flex align-center justify-space-between">
+              <div class="d-flex">
+                <v-avatar size="40px">
+                  <v-img :src="require('@/assets/images/avatars/2.png')"></v-img>
+                </v-avatar>
+                <v-list-item>
+                  <v-list-item-content class=" text-sm-h5">{{item.createdBy}}</v-list-item-content>
+                </v-list-item>
+              </div>
+              <v-chip
+                class="mb-4 ml-4"
+                color="primary"
+                text-color="white"
+                v-if="item.orderedBy"
+              >
+                {{item.orderedBy}}
+              </v-chip>
+            </div>
 
-          <v-card-title>
-            {{item.name}}
-          </v-card-title>
-          <div>
+            <v-card-title class="pl-0 font-weight-bold">
+              {{item.name}}
+            </v-card-title>
+            <v-simple-table dense >
+              <template v-slot:default>
+                <tbody>
+                <tr
+                  v-for="ingredient in item.ingredients"
+                  :key="ingredient.name"
+                >
+                  <td class="pl-0" style="font-size: 18px;">{{ ingredient.product.name }}</td>
+                  <td class="pr-0" style="font-size: 18px;">{{ ingredient.amount }}</td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
+          <div v-else>
+            <v-skeleton-loader
+              :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+              type="article"
+            ></v-skeleton-loader>
+
           </div>
-          <v-card-subtitle>
-            Количество: {{item.amount}}<br>
-            Набор из {{item.goods.name}}
-          </v-card-subtitle>
-
-          <v-card-actions>
-
+          <v-skeleton-loader
+            v-if="loading"
+            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+            type="actions"
+          ></v-skeleton-loader>
+          <v-card-actions v-else >
+<!--            <createDialog :prop-item="item" text-btn="Изменить" @success="listOfData"/>-->
+            <div class="mt-4 mr-2 " style="min-width: 118px; max-width: 118px">{{item.createdAt | date}}</div>
             <v-spacer></v-spacer>
-            <createDialog :prop-item="item" text-btn="Изменить" @success="listOfData"/>
+            <v-btn class="rounded" rounded small color="primary" :loading="sellLoading" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
           </v-card-actions>
 
         </v-card>
@@ -70,7 +114,8 @@ export default {
     items: [],
     imagesSrc: [],
     icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft},
-    loading: false
+    loading: false,
+    sellLoading: false,
   }),
   mounted() {
    this.listOfData()
@@ -84,7 +129,7 @@ export default {
           r.data.map(i => {
             this.image(i.id)
           })
-          this.loading = false
+          setTimeout(() => this.loading = false, 1000)
         })
     },
    image(v){
@@ -110,6 +155,19 @@ export default {
          const errorMessage = error.response ? error.response.data : 'Unknown error';
          this.$store.commit('setSnackbars', errorMessage);
        });
+    },
+    saveToSell(id) {
+      this.sellLoading = true
+      this.$store.dispatch('saveToSell',id)
+        .then(() => {
+          this.listOfData()
+          this.sellLoading = false
+        })
+        .catch(error => {
+          this.sellLoading =false
+          const errorMessage = error.response ? error.response.data : 'Unknown error';
+          this.$store.commit('setSnackbars', errorMessage);
+        });
     }
   }
 }

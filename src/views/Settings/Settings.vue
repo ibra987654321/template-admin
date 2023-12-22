@@ -1,7 +1,7 @@
 <template>
   <v-card class="px-2 py-2">
     <v-row>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <use-table
           title="Филиалы"
           :headers="headers"
@@ -13,8 +13,9 @@
           delete-dispatch="deleteAllBranch"
         ></use-table>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <use-table
+          :select-for-api="selectForApi"
           title="Материалы"
           :headers="headers"
           :edited-items="editedItem"
@@ -25,9 +26,9 @@
           delete-dispatch="deleteMaterial"
         ></use-table>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
         <use-table
-          title="Продукты"
+          title="Категории продуктов"
           :headers="category.headers"
           :edited-items="category.editedItem"
           :show-to-edit="category.showToEdit"
@@ -38,19 +39,22 @@
           delete-dispatch="deleteCategory"
         ></use-table>
       </v-col>
-<!--      <v-col cols="6">-->
-<!--        <use-table-->
-<!--          title="Продукты"-->
-<!--          :headers="product.headers"-->
-<!--          :edited-items="product.editedItem"-->
-<!--          :show-to-edit="product.showToEdit"-->
-<!--          get-dispatch="getProduct"-->
-<!--          put-dispatch="putProduct"-->
-<!--          post-dispatch="postProduct"-->
-<!--          delete-dispatch="deleteProduct"-->
-<!--        ></use-table>-->
-<!--      </v-col>-->
-      <v-col cols="6">
+      <v-col cols="12" sm="6">
+        <use-table
+          :select-for-api="productName.selectForApi"
+          title="Название наборов"
+          :headers="productName.headers"
+          :edited-items="productName.editedItem"
+          :show-to-edit="productName.showToEdit"
+          :child-table="productName.childMaterialComponent"
+          :get-dispatch="'getProductName'"
+          :put-dispatch="'putProductName'"
+          :post-dispatch="'postProductName'"
+          :delete-dispatch="'deleteProductName'"
+          @newItem="handleChange"
+        ></use-table>
+      </v-col>
+      <v-col v-if="admin" cols="12" sm="6">
         <createUser/>
       </v-col>
     </v-row>
@@ -61,6 +65,7 @@
 <script>
 import useTable from '@/components/useDashboard/useTable'
 import createUser from '@/views/Settings/Components/createUser'
+import { admin } from '@/helpers/roles'
 export default {
   name: 'Settings',
   components: {
@@ -75,16 +80,24 @@ export default {
     ],
     editedItem: {
       id: 0,
-      name: ''
+      name: '',
+      unitOfMeasurement: ''
     },
     showToEdit: [
       {type: 'input', col: 12, value: 'name',label: 'Название' }
     ],
+    selectForApi: {
+      params: true,
+      model: 1,
+      modelEquals: 1,
+      items: []
+    },
     product: {
+      title: 'Продукты',
+      nameObject: 'categoryId',
       header: [
         {value: 'index', text: '#' },
         {value: 'name', text: 'Название'},
-        {value: 'unitOfMeasurement', text: 'Ед измерение'},
         {value: 'actions', text: 'Действие'},
       ],
       editedItem: {
@@ -94,8 +107,7 @@ export default {
         categoryId: ''
       },
       showToEdit: [
-        {type: 'input', col: 6, value: 'name',label: 'Название' },
-        {type: 'input', col: 6, value: 'unitOfMeasurement',label: 'Ед измерение' }
+        {type: 'input', col: 12, value: 'name',label: 'Название' },
       ],
       actions: {
         getDispatch: "getProduct",
@@ -109,6 +121,7 @@ export default {
         {value: 'index', text: '#' },
         {value: 'name', text: 'Название'},
         {value: 'type', text: 'Тип'},
+        {value: 'unitOfMeasurement', text: 'Ед измерение'},
         {value: 'actions', text: 'Действие'},
       ],
       editedItem: {
@@ -118,10 +131,81 @@ export default {
       },
       showToEdit: [
         {type: 'input', col: 6, value: 'name',label: 'Название' },
-        {type: 'input', col: 6, value: 'type',label: 'Тип' }
+        {type: 'input', col: 3, value: 'type',label: 'Тип' },
+        {type: 'input', col: 3, value: 'unitOfMeasurement',label: 'Ед измерение' }
       ],
+    },
+    productName: {
+      headers: [
+        {value: 'index', text: '#' },
+        {value: 'name', text: 'Название'},
+        {value: 'actions', text: 'Действие'},
+      ],
+      editedItem: {
+        id: 0,
+        name: '',
+      },
+      showToEdit: [
+        {type: 'input', col: 12, value: 'name',label: 'Название' },
+      ],
+      actions: {
+        getDispatch: "getProductName",
+        putDispatch: "putProductName",
+        postDispatch: "postProductName",
+        deleteDispatch: "deleteProductName",
+      },
+      selectForApi: {
+        params: true,
+        model: 1,
+        modelEquals: 1,
+        items: [1,2,3]
+      },
+      childMaterialComponent: {
+        title: 'Материалы к продукту',
+        nameObject: 'id',
+        header: [
+          {value: 'index', text: '#' },
+          {value: 'name', text: 'Название'},
+          {value: 'actions', text: 'Действие'},
+        ],
+        editedItem: {
+          id: 0,
+          "materialId": 0,
+          "productionId": 0
+        },
+        showToEdit: [
+          {type: 'select-add', col: 12, value: 'materialId',label: 'Название', data: [], params: {text: 'name', value: 'id'} },
+        ],
+        actions: {
+          getDispatch: "getMaterialComponent",
+          putDispatch: "putMaterialComponent",
+          postDispatch: "postMaterialComponent",
+          deleteDispatch: "deleteMaterialComponent",
+        }
+      },
     }
-  })
+  }),
+  computed: {
+    admin() {
+      return admin()
+    }
+  },
+  mounted() {
+    this.$store.dispatch('getCategory')
+      .then(r => {
+        this.selectForApi.items = r.data
+        this.productName.selectForApi.items = r.data
+      })
+  },
+  methods: {
+    handleChange(event) {
+      this.$store.dispatch('getMaterial', event)
+        .then(r => {
+          this.productName.childMaterialComponent.showToEdit[0].data = r.data
+
+        })
+    }
+  }
 }
 </script>
 

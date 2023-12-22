@@ -224,6 +224,7 @@
               :headers="$props.tableData.header"
               :edited-items="$props.tableData.editedItem"
               :show-to-edit="$props.tableData.showToEdit"
+              @newItem="$emit('newItem')"
             ></use-data-table>
           </v-col>
         </v-row>
@@ -243,6 +244,7 @@
         v-if="!view"
         color="blue darken-1"
         text
+        :loading="loading"
         @click="save"
       >
         {{saveBtn}}
@@ -260,6 +262,7 @@ export default {
     useDataTable,
   },
   props: {
+    loading: Boolean,
     title: String,
     disabled: Boolean,
     editedItem: Object,

@@ -2,6 +2,7 @@
 <div>
   <use-table
     title="Пользователи"
+    :select-for-api="selectForApi"
     :headers="headers"
     :edited-items="editedItem"
     :show-to-edit="showToEdit"
@@ -35,10 +36,17 @@ export default {
     showToEdit: [
 
     ],
+    selectForApi: {
+      params: true,
+      model: 1,
+      modelEquals: 1,
+      items: []
+    },
   }),
   mounted() {
     this.$store.dispatch('getAllRoles')
       .then(r => {
+        this.selectForApi.items = r.data
         this.showToEdit = [
           {type: 'input', col: 6, value: 'username',label: 'Имя' },
           {type: 'input', col: 6, value: 'password',label: 'Пароль' },

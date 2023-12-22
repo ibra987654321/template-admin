@@ -11,7 +11,7 @@
     <!-- Navigation Header -->
     <div class="vertical-nav-header d-flex items-center ps-6 pe-5 pt-5 pb-2">
       <router-link
-        to="/dashboard"
+        to="/storage"
         class="d-flex align-center text-decoration-none"
       >
         <v-slide-x-transition>

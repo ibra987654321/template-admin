@@ -1,5 +1,5 @@
 <template>
-<div class="d-flex justify-space-around align-center">
+<div class="d-flex justify-space-around align-center" :class="$vuetify.breakpoint.mobile && 'flex-column'">
   <dialogs-for-add-product @success="loadData()"></dialogs-for-add-product>
 
   <v-card class=" elevation-9" max-width="400" v-for="item in listOfData">

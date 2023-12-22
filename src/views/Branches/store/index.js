@@ -14,6 +14,9 @@ export default {
     },
     currentAmountByGoods(_, payload) {
       return baseURL.post(`/storage/api/goods/currentAmountByGoods/${payload}`)
+    },
+    toDisposal(_, payload) {
+      return baseURL.post(`/storage/api/goods/disposal/${payload.id}`, payload.data)
     }
   }
 }

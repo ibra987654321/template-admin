@@ -16,7 +16,7 @@
             @click="isDrawerOpen = !isDrawerOpen"
           ></v-app-bar-nav-icon>
           <v-spacer></v-spacer>
-          <theme-switcher></theme-switcher>
+<!--          <theme-switcher></theme-switcher>-->
           <app-bar-user-menu></app-bar-user-menu>
         </div>
       </div>

@@ -38,6 +38,9 @@ export default {
           },
         })
     },
+    saveToSell(_, payload) {
+        return baseURL.post(`/storage/api/set/sell/${payload}`)
+    },
     saveToDepartment(_, payload) {
       return baseURL.post('/storage/api/goods/saveToDepartment/' + payload.to, payload)
     },

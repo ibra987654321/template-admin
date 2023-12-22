@@ -2,7 +2,11 @@ import { baseURL } from '@/environments/environment'
 import { getToken } from '@/helpers/helpers'
 
 export default {
-  state: {},
+  state: {
+    categoryId: '',
+    materialCategoryId: '',
+    productNameCategoryId: '',
+  },
   actions: {
     // branch-controller
     allBranchesWithDepartments() {
@@ -25,13 +29,16 @@ export default {
 
     // material-controller
 
-    getMaterial() {
-      return baseURL.get('/storage/api/settings/material/all')
+    getMaterial({ state }, payload) {
+      state.materialCategoryId = payload
+      return baseURL.get('/storage/api/settings/material/all/' + payload)
     },
-    postMaterial(_, payload) {
+    postMaterial({state}, payload) {
+        payload.categoryId = state.materialCategoryId
       return baseURL.post('/storage/api/settings/material/create', payload)
     },
-    putMaterial(_, payload) {
+    putMaterial({state}, payload) {
+        payload.categoryId = state.materialCategoryId
       return baseURL.put('/storage/api/settings/material/update', payload)
     },
     deleteMaterial(_, payload) {
@@ -40,23 +47,63 @@ export default {
 
     // product-controller
 
-    getProduct(_, payload) {
+    getProduct(store, payload) {
+      store.state.categoryId = payload
       return baseURL.get('/storage/api/settings/product/all/' + payload)
     },
-    postProduct(_, payload) {
+    postProduct(store, payload) {
+      payload.categoryId = store.state.categoryId
       return baseURL.post('/storage/api/settings/product/create', payload)
     },
-    putProduct(_, payload) {
-      return baseURL.put('/storage/api/settings/product/update', payload)
+    putProduct(store, payload) {
+      payload.categoryId = store.state.categoryId
+      return baseURL.put('/storage/api/settings/product/update/'+ payload.id, payload)
     },
     deleteProduct(_, payload) {
       return baseURL.delete(`/storage/api/settings/product/delete/${payload.id}`)
     },
 
+    // component-controller
+
+    getMaterialComponent(store, payload) {
+      store.state.categoryId = payload
+      return baseURL.get('/storage/api/settings/component/all/' + payload)
+    },
+    postMaterialComponent(store, payload) {
+      delete payload.id
+      payload.productionId = store.state.categoryId
+      return baseURL.post('/storage/api/settings/component/create', payload)
+    },
+    putMaterialComponent(store, payload) {
+      payload.categoryId = store.state.categoryId
+      return baseURL.put('/storage/api/settings/component/update/'+ payload.id, payload)
+    },
+    deleteMaterialComponent(_, payload) {
+      return baseURL.delete(`/storage/api/settings/component/delete/${payload.id}`)
+    },
+
+    // productName-controller
+
+    getProductName(store, payload) {
+      store.state.productNameCategoryId = payload
+      return baseURL.get('/storage/api/settings/production/all/' + payload)
+    },
+    postProductName(store, payload) {
+          payload.categoryId = store.state.productNameCategoryId
+      return baseURL.post('/storage/api/settings/production/create', payload)
+    },
+    putProductName(store, payload) {
+          payload.categoryId = store.state.productNameCategoryId
+      return baseURL.put('/storage/api/settings/production/update', payload)
+    },
+    deleteProductName(_, payload) {
+      return baseURL.delete(`/storage/api/settings/production/delete/${payload.id}`)
+    },
+
     // user
 
-    getAllUser() {
-      return baseURL.get('/storage/api/admin/all/users')
+    getAllUser(_, payload) {
+      return baseURL.get('/storage/api/admin/all/users/' + payload)
     },
     getAllRoles() {
       return baseURL.get('/storage/api/role/all')

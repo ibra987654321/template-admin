@@ -1,49 +1,26 @@
 <template>
+<div>
   <v-dialog
     transition="dialog-bottom-transition"
     max-width="600"
     v-model="dialog"
   >
     <template v-slot:activator="{ on, attrs }">
-      <div  class="d-flex mb-5" >
-        <v-btn
-          color="primary"
-          fab
-          v-bind="attrs"
-          v-on="on"
-          small
-          class="mb-2 mr-2"
-          @click="move = false"
-        ><v-icon small  class="mx-4">{{icon.mdiPlus}}</v-icon></v-btn>
-        <v-btn
-          color="primary"
-          fab
-          v-bind="attrs"
-          v-on="on"
-          small
 
-          @click="move = true"
-        >  <v-icon small  class="mx-4">{{icon.mdiArrowRight}}</v-icon></v-btn>
-      </div>
+        <v-btn
+          color="primary"
+          v-bind="attrs"
+          v-on="on"
+          small
+          @click="dialog = true"
+        > Переместить</v-btn>
+
 
     </template>
     <template v-slot:default="dialog">
       <v-card>
-        <v-card-title class="mb-8" >{{move ? 'Перемещение' : 'Добавление'}} товара в филиал</v-card-title>
+        <v-card-title class="mb-8" >Переместить товары в цех</v-card-title>
         <v-card-text class="d-flex flex-column">
-          <div class="d-flex align-center">
-            <v-select v-if="move"
-              v-model="item.to"
-              label="Филиалы"
-              :items="items"
-              item-value="id"
-              item-text="name"
-              hide-details
-              dense
-              outlined
-              class="mb-2"
-            ></v-select>
-          </div>
           <div class="mt-4">
             <v-select
               v-model="categoryM"
@@ -104,12 +81,12 @@
                 v-on="on"
                 color="primary"
                 :disabled="!valid"
-              >{{move ? 'Переместить' : 'Добваить'}}</v-btn>
+              >Переместить</v-btn>
             </template>
             <template v-slot:default="dialog">
               <v-card>
                 <v-card-title>
-                  Вы действительно хотите сделать {{move ? 'перемещение' : 'добавление'}}?
+                  Вы действительно хотите сделать переместить?
                 </v-card-title>
                 <v-card-actions class="justify-space-between">
                   <v-btn
@@ -130,15 +107,17 @@
       </v-card>
     </template>
   </v-dialog>
+</div>
 </template>
 
 <script>
-import {mdiArrowRight, mdiPlus} from '@mdi/js'
+import { mdiArrowRight, mdiPlus } from '@mdi/js'
 
 export default {
-  name: 'moveEachBranch',
+  name: 'moveToDepartment',
   props: {
-    id: Number
+    from: Number,
+    to: Number
   },
   data:() => ({
     searchItems: '',
@@ -159,8 +138,6 @@ export default {
     },
     icon: {mdiArrowRight, mdiPlus}
   }),
-  mounted() {
-  },
   watch: {
     categoryM(v) {
       this.$store.dispatch('getProduct', v)
@@ -171,38 +148,18 @@ export default {
     },
     dialog(v) {
       if (v) {
-        if (this.move) {
-          this.$store.dispatch('allBranchesWithDepartments')
-            .then(r => {
-              this.items = r.data.filter((item) => {
-                return item.id !== this.$props.id;
-              });
-            })
-            .catch(e => this.$store.commit('setSnackbars', e.message))
           this.$store.dispatch('getCategory')
             .then(r => {
               this.category = r.data
               this.categoryM = 1
             })
             .catch(e => this.$store.commit('setSnackbars', e.message))
-        } else {
-          this.$store.dispatch('getCategory')
-            .then(r => {
-              this.category = r.data
-              this.categoryM = 1
-            })
-            .catch(e => this.$store.commit('setSnackbars', e.message))
-        }
       }
     }
   },
   computed: {
     valid() {
-      if (this.move) {
-        return !!(this.item.amount && this.item.productId && this.item.to );
-      } else {
         return !!(this.item.amount && this.item.productId);
-      }
     },
     filteredItems() {
       const regions = this.products.filter((item) => {
@@ -221,17 +178,19 @@ export default {
   },
   methods: {
     save() {
-    this.item.from = this.$props.id
-      this.$store.dispatch(this.move ? 'moveToBranch' : 'saveToBranch', this.item)
+      this.item.from = this.$props.from
+      this.item.to = this.$props.to
+      this.$store.dispatch('moveToDepartment', this.item)
         .then(r => {
-          this.$emit('success', r.data)
+          // this.$emit('success', r.data)
+          this.categoryM = ''
+          this.searchItems = ''
           this.item = {
             "productId": null,
             "amount": null,
             from: '',
             to: ''
           }
-          this.searchItems = ''
           this.active = []
           this.dialog = false
         })

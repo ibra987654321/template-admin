@@ -105,6 +105,7 @@
               <v-btn
                 color="blue darken-1"
                 text
+                :loading="loading2"
                 @click="save"
               >
                 Сохранить
@@ -157,8 +158,10 @@
             :table-data="$props.childTable"
             :data="childTableData"
             :view="viewOnly"
+            :loading="loading2"
             @close="close()"
             @save="save($event)"
+            @newItem="$emit('newItem', emitId)"
           ></use-dialog-content>
         </v-dialog>
         <v-dialog
@@ -181,6 +184,7 @@
               <v-btn
                 color="blue darken-1"
                 text
+                :loading="loading2"
                 @click="deleteItemConfirm"
               >
                 OK
@@ -243,6 +247,7 @@
               <v-btn
                 color="blue darken-1"
                 text
+                :loading="loading2"
                 @click="save"
               >
                 Сохранить
@@ -251,12 +256,25 @@
           </v-card>
         </v-dialog>
         <v-select
-          v-if="$props.selectForApi"
+          v-if="$props.selectForApi && !$props.selectForApi.params"
           v-model="$props.selectForApi.model"
           :items="$props.selectForApi.items"
           class="select"
           hide-details
           outlined
+          dense
+          @change="selected()"
+        >
+        </v-select>
+        <v-select
+          v-if="$props.selectForApi && $props.selectForApi.params"
+          v-model="$props.selectForApi.model"
+          :items="$props.selectForApi.items"
+          class="select"
+          hide-details
+          outlined
+          item-text="name"
+          item-value="id"
           dense
           @change="selected()"
         >
@@ -655,6 +673,7 @@ export default {
     ],
     showFullText: false,
     loading1: false,
+    loading2: false,
     search: '',
     fab: false,
     currentFile: undefined,
@@ -681,7 +700,8 @@ export default {
       mdiDelete,
       mdiClose,
     },
-    pagination: {}
+    pagination: {},
+    emitId: ''
   }),
   computed: {
     header() {
@@ -785,6 +805,7 @@ export default {
     setTimeout(() => {
       if (this.$props.selectForApi) {
          this.loading1 = true
+        this.emitId = this.$props.selectForApi.model
         this.$store.dispatch(this.$props.getDispatch, this.selectedModel).then(r => {
           this.data = r.data
           this.loading1 = false
@@ -820,9 +841,10 @@ export default {
     },
     selected() {
        this.loading1 = true
+      this.emitId = this.$props.selectForApi.model
       this.$store.dispatch(this.$props.getDispatch, this.$props.selectForApi.model)
         .then(r => {
-          this.data = r
+          this.data = r.data
           this.loading1 = false
         })
     },
@@ -854,6 +876,7 @@ export default {
           })
       }
       if (this.$props.childTable) {
+
         this.$store.dispatch(this.$props.childTable.actions.getDispatch, item.id)
           .then(r => {
             this.childTableData = r.data
@@ -902,9 +925,15 @@ export default {
     },
 
     deleteItemConfirm() {
+      this.loading2 = true
       const item = this.data.splice(this.editedIndex, 1)
       this.$store.dispatch(this.$props.deleteDispatch, ...item)
-      this.closeDelete()
+        .then(() => {
+          this.loading2 = false
+          this.closeDelete()
+          this.$store.commit('setSnackbars', 'Успешно удалено')
+        })
+
     },
 
     close() {
@@ -924,11 +953,14 @@ export default {
     },
 
     async save(event) {
+      this.loading2 = true
       if (this.editedIndex > -1) {
         await this.$store.dispatch(this.putDispatch, this.editedItem)
           .then(r => {
             if (r !== undefined) {
               Object.assign(this.data[this.editedIndex], r.data)
+              this.loading2 = false
+              this.$store.commit('setSnackbars', 'Успешно обновлено')
               this.close()
             }
           })
@@ -937,6 +969,8 @@ export default {
           .then((r) => {
             if (r !== undefined) {
               this.data.unshift(r.data)
+              this.loading2 = false
+              this.$store.commit('setSnackbars', 'Успешно создано')
               this.close()
             }
           })

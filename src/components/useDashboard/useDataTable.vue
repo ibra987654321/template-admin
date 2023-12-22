@@ -191,7 +191,6 @@ export default {
     formTitle() {
       return this.editedIndex === -1 ? 'Создать' : 'Изменить'
     },
-    // eslint-disable-next-line consistent-return
     dateFilter() {
       if (this.$props.filters) {
         if (this.$props.filters.date) {
@@ -206,7 +205,6 @@ export default {
         }
       }
     },
-    // eslint-disable-next-line consistent-return
     statusFilter() {
       if (this.$props.filters) {
         if (this.$props.filters.status) {
@@ -214,7 +212,6 @@ export default {
         }
       }
     },
-    // eslint-disable-next-line consistent-return
     checkFilter() {
       if (this.$props.filters) {
         if (this.$props.filters.checkbox) {
@@ -233,11 +230,12 @@ export default {
   },
   watch: {
     dialog(val) {
-      // eslint-disable-next-line no-unused-expressions
+      if(val && this.formTitle === 'Создать') {
+        this.$emit('newItem')
+      }
       val || this.close()
     },
     dialogDelete(val) {
-      // eslint-disable-next-line no-unused-expressions
       val || this.closeDelete()
     },
   },
@@ -245,7 +243,6 @@ export default {
     this.editedItem = this.$props.editedItems
   },
   methods: {
-
     editItem(item) {
       this.editedIndex = this.itemsWithIndex.indexOf(item)
       this.editedItem = { ...item }
@@ -290,6 +287,7 @@ export default {
       if (this.editedIndex > -1) {
         await this.$store.dispatch(this.putDispatch, this.editedItem)
         Object.assign(this.itemsWithIndex[this.editedIndex], this.editedItem)
+        this.close()
       } else {
         if (this.$props.filters) {
           if (this.$props.filters.date) {
@@ -299,7 +297,7 @@ export default {
         await this.$store.dispatch(this.postDispatch, event)
           .then(r => {
             if (r !== undefined) {
-              this.data.unshift(r)
+              this.data.unshift(r.data)
               this.close()
             }
           })

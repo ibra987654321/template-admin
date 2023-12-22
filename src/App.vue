@@ -21,14 +21,14 @@ export default {
     TheSnackbars,
   },
   mounted() {
-    const theme = getDarkTheme()
-    if (theme) {
-      if (theme === 'true') {
+    // const theme = getDarkTheme()
+    // if (theme) {
+    //   if (theme === 'true') {
         this.$vuetify.theme.dark = true
-      } else {
-        this.$vuetify.theme.dark = false
-      }
-    }
+    //   } else {
+    //     this.$vuetify.theme.dark = false
+    //   }
+    // }
   },
   setup() {
     const { route } = useRouter()

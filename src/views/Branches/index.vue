@@ -2,12 +2,18 @@
   <v-row>
     <v-col cols="12">
       <v-btn @click="$router.go(-1)" class="mr-2" small><v-icon>{{icons.mdiArrowLeft}}</v-icon></v-btn>
-      <createDialog text-btn="Собрать набор" @success="listOfData"/>
+      <createDialog v-if="admin || florist" text-btn="Собрать набор" @success="listOfData"/>
     </v-col>
-    <v-col cols="12" sm="4">
+    <v-col cols="12" sm="4" v-if="admin">
       <branchItem  v-if="!loading" :item="items.shop" @successDelete="listOfData" @successUpdate="listOfData()"/>
     </v-col>
-    <v-col cols="12" sm="8">
+    <v-col :cols="florist ? 12 : 6" v-if="coordinator || florist">
+      <stock  v-if="!loading " :item="items.stock" :work-shop="items.workshops" @successDelete="listOfData" @successUpdate="listOfData()"/>
+    </v-col>
+    <v-col cols="6" v-if="coordinator">
+      <workShop  v-if="!loading" :item="items.workshops" @successDelete="listOfData" @successUpdate="listOfData()"/>
+    </v-col>
+    <v-col cols="12" sm="8" v-if="admin">
       <v-row>
         <v-col cols="12" sm="6">
           <flowers  v-if="!loading" :item="items.flowers" @successDelete="listOfData" @successUpdate="listOfData()"/>
@@ -30,6 +36,7 @@ import workShop from '@/views/Branches/components/WorkShop'
 import stock from '@/views/Branches/components/Stock'
 import createDialog from '@/views/Department/components/createDialog'
 import {mdiArrowLeft} from '@mdi/js'
+import { coordinator, admin, florist } from '@/helpers/roles'
 export default {
   name: 'index',
   components: {
@@ -51,6 +58,17 @@ export default {
   }),
   mounted() {
     this.listOfData()
+  },
+  computed: {
+    florist() {
+      return florist()
+    },
+    coordinator() {
+      return coordinator()
+    },
+    admin() {
+      return admin()
+    },
   },
   methods: {
     listOfData() {

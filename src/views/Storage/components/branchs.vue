@@ -1,41 +1,46 @@
 <template>
   <v-row dense>
-    <v-col v-for="item in branches">
+    <v-col v-for="item in branches"  :class="$vuetify.breakpoint.mobile ? 'mb-4 px-2' : ''">
       <v-card
-        class="mx-auto d-flex flex-column justify-space-between elevation-2"
+        class="mx-auto d-flex flex-column justify-space-between elevation-10"
+
         max-width="344"
         style="height: 100%;"
         outlined
       >
         <v-list-item three-line>
           <v-list-item-content>
-            <div class="text-overline mb-4">
-              Филиал
+            <div class="d-flex justify-space-between align-center">
+              <div class="text-overline mb-4">
+                {{item.name}}
+              </div>
+              <moveEachBranch :id="item.id"/>
             </div>
-            <v-list-item-title class="text-h5 mb-1">
-              {{item.name}}
-            </v-list-item-title>
-            <v-list-item-subtitle style="min-width: 130px" v-for="good in item.goods">
-              {{good.name}} : {{good.amount}}
-            </v-list-item-subtitle>
-<!--            {{getSets(item.id)}}-->
-<!--            <v-list-item-subtitle v-if="sets.length" style="min-width: 130px" v-for="good in sets">-->
-<!--              {{good.name}} : {{good.amount}}-->
-<!--            </v-list-item-subtitle>-->
+
+            <div>Товары</div>
+            <v-simple-table dense  >
+              <template v-slot:default>
+                <tbody>
+                <tr
+                  v-for="item in item.goods"
+                  :key="item.name"
+                >
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.amount }}</td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+            <div>Наборы</div>
+          <get-all-sets-for-branch :id="item.id"></get-all-sets-for-branch>
           </v-list-item-content>
 
-          <v-list-item-avatar
-            tile
-            size="80"
-            color="grey"
-          ></v-list-item-avatar>
         </v-list-item>
 
         <v-card-actions>
           <v-btn
-            outlined
             rounded
-            text
+            color="primary"
             @click="$router.push({path: `detail/${item.id}`})"
           >
             Подробнее
@@ -49,26 +54,19 @@
 <script>
 import { getToken } from '@/helpers/helpers'
 import { environment, SETTING, STORAGE } from '@/environments/endPoint'
+import getAllSetsForBranch from '@/views/Storage/components/branchComponents/getAllSetsForBranch'
+import moveEachBranch from '@/views/Storage/components/moveEachBranch'
 export default {
   name: 'branchs',
+  components: {getAllSetsForBranch, moveEachBranch},
   data:() => ({
     branches: [],
-    sets: [],
-    // eventSource: {
-    //   goods: '',
-    //   sets: ''
-    // }
   }),
   mounted() {
     this.initEventSource()
   },
+
   methods: {
-    getSets(v) {
-      this.eventSource1 = new EventSource(`${environment.main }${STORAGE}/set/allnameAmount/${v}?token=${getToken()}`);
-      this.eventSource1.onmessage = (event) => {
-        this.sets = JSON.parse(event.data)
-      };
-    },
     initEventSource() {
       this.eventSource = new EventSource(`${environment.main }${SETTING}/branch/all/goods/byFlux?token=${getToken()}`);
       this.eventSource.onmessage = (event) => {
@@ -79,9 +77,6 @@ export default {
       // Закрытие соединения
       if (this.eventSource) {
         this.eventSource.close();
-      }
-      if (this.eventSource1) {
-        this.eventSource1.close();
       }
     },
   },

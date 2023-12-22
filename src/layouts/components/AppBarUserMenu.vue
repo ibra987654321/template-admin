@@ -45,9 +45,9 @@
           style="vertical-align:middle"
         >
           <span class="text--primary font-weight-semibold mb-n1">
-            userName
+            {{ userName }}
           </span>
-          <small class="text--disabled text-capitalize"> role </small>
+          <small class="text--disabled text-capitalize"> {{ role }} </small>
         </div>
       </div>
 
@@ -65,7 +65,7 @@
           </v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>Logout</v-list-item-title>
+          <v-list-item-title>Выйти</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -87,17 +87,17 @@ import { decodeJWT, logOut } from '@/helpers/auth'
 
 export default {
   setup() {
-    // const userName = decodeJWT().sub.toUpperCase()
-    // const role = decodeJWT().roles[0].slice(5, 14)
-    // const userNm = userName.slice(0, 2)
+    const userName = decodeJWT().sub.toUpperCase()
+    const role = decodeJWT().roles[0]
+    const userNm = userName.slice(0, 2)
     function logout() {
       logOut()
     }
 
     return {
-      // userNm,
-      // userName,
-      // role,
+      userNm,
+      userName,
+      role,
       logout,
       icons: {
         mdiAccountOutline,

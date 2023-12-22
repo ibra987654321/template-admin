@@ -13,48 +13,65 @@
 
     <v-list-item three-line>
       <v-list-item-content>
-        <div class="text-overline mb-4">
+        <div class="text-overline mb-4 " :class="(coordinator || florist) && 'd-flex justify-space-between'">
           Склад
+          <moveEachBranch v-if="coordinator || florist" :id="Number($route.params.id)"/>
+          <moveToDepartment v-if="coordinator" :to="$props.workShop.id" :from="$props.item.id"/>
         </div>
         <v-list-item-title class="text-h5 mb-1">
           {{ item.name }}
         </v-list-item-title>
       </v-list-item-content>
 
-      <v-list-item-avatar
-        tile
-        size="80"
-        color="grey"
-      ></v-list-item-avatar>
     </v-list-item>
     <v-divider class="mx-4"></v-divider>
     <v-card-text>
-      <v-chip-group
-        active-class="deep-purple accent-4 white--text"
-        column
-      >
-        <v-chip  v-for="product in goods" :color="product.amount < 5 ? 'error' : ''">{{product.name}} : {{product.amount}}</v-chip>
-      </v-chip-group>
+      <v-data-table
+        :headers="[  { text: 'Название', value: 'name' }, { text: 'Кол-во', value: 'amount' },]"
+        :items="goods"
+        hide-default-footer
+      ></v-data-table>
     </v-card-text>
-    <v-card-text >
-      <v-btn color="primary" @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
+    <v-card-text class="d-flex">
+      <v-btn color="primary" small @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
+     <div v-if="florist" class="ml-5">
+       <to-disposal  :department-id="$props.item.id"></to-disposal>
+     </div>
     </v-card-text>
   </v-card>
 </template>
 
 <script>
 import { getToken } from '@/helpers/helpers'
+import moveEachBranch from '@/views/Storage/components/moveEachBranch'
+import { coordinator, florist } from '@/helpers/roles'
+import moveToDepartment from '@/views/Branches/components/moveToDepartment'
+import toDisposal from '@/views/Branches/components/toDisposal'
 
 export default {
   name: 'Stock',
   props: {
-    item: Object
+    item: Object,
+    workShop: Object
+  },
+  components: {
+    moveEachBranch,
+    moveToDepartment,
+    toDisposal
   },
   data:() => ({
     goods: []
   }),
   mounted() {
     this.initEventSource()
+  },
+  computed: {
+    coordinator() {
+      return coordinator()
+    },
+    florist() {
+      return florist()
+    },
   },
   methods: {
     deleteItem() {

@@ -21,17 +21,14 @@
     </v-card-text>
 
     <v-divider class="mx-4"></v-divider>
-    <v-card-text>
-      <v-chip-group
-        active-class="deep-purple accent-4 white--text"
-        column
-      >
-        <v-chip x-large v-for="product in goods">{{product.name}} : {{product.amount}}</v-chip>
-      </v-chip-group>
-    </v-card-text>
     <v-card-text >
-      <updateDialog  :item="item" @success="$emit('successUpdate')"/>
-      <v-btn @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
+      <v-data-table
+        :headers="[  { text: 'Название', value: 'name' }, { text: 'Кол-во', value: 'amount' },]"
+        :items="sets"
+        hide-default-footer
+      ></v-data-table>
+<!--      <updateDialog  :item="item" @success="$emit('successUpdate')"/>-->
+      <v-btn color="primary" small @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
       <v-dialog
         transition="dialog-bottom-transition"
         max-width="600"
@@ -87,29 +84,17 @@ export default {
         .then(() => this.$emit('successDelete'))
         .catch(e => this.$store.commit('setSnackbars', e.message))
     },
-    countSets(v) {
-      return this.$store.dispatch('getAllSets', v)
-        .then(r => {
-          return  r.data
-        })
-    },
     initEventSource() {
-      this.eventSource = new EventSource(`http://176.126.164.208:8070/storage/api/goods/currentAmountByGoodsbyFlux/${this.item.id}?token=${getToken()}`);
+      this.eventSource2 = new EventSource(`http://176.126.164.208:8070/storage/api/set/allNameAmountByDepartmentFlux/${this.item.id}?token=${getToken()}`);
 
-      // Обработчик открытия соединения
-      this.eventSource.onopen = () => {
-      };
-
-      // Обработчик получения сообщения
-      this.eventSource.onmessage = (event) => {
-        this.goods = JSON.parse(event.data)
+      this.eventSource2.onmessage = (event) => {
+        this.sets = JSON.parse(event.data)
       };
 
     },
     disconnectEventSource() {
-      // Закрытие соединения
-      if (this.eventSource) {
-        this.eventSource.close();
+      if (this.eventSource2) {
+        this.eventSource2.close();
       }
     },
   },
