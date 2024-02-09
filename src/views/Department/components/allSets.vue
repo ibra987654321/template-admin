@@ -1,26 +1,46 @@
 <template>
   <div>
     <div class="mb-5">
-      <v-btn @click="$router.go(-1)" class="mr-2" small><v-icon>{{icons.mdiArrowLeft}}</v-icon></v-btn>
-
+      <v-btn v-if="admin || coordinator || superUser" @click="$router.go(-1)" class="mr-2" small><v-icon>{{icons.mdiArrowLeft}}</v-icon></v-btn>
     </div>
+    <div class="d-flex " :class="$vuetify.breakpoint.mobile && 'flex-column mb-5'">
+      <v-text-field
+        v-model="searchText"
+        label="Поиск по названию"
+        :dense="$vuetify.breakpoint.mobile"
+        hide-details
+        outlined
+        class="mb-5"
+        :class="!$vuetify.breakpoint.mobile && 'mr-2'"
+      ></v-text-field>
+      <v-select
+        v-model="selectCase"
+        label="Сортировка"
+        hide-details
+        :dense="$vuetify.breakpoint.mobile"
+        outlined
+        :items="['Новые', 'Старые']"
+      ></v-select>
+    </div>
+
     <div class="mt-2 d-flex flex-wrap">
 
-      <v-hover v-slot="{ hover }" v-for="item in items">
+      <v-hover v-slot="{ hover }" v-for="item in filteredItems">
         <v-card
           :loading="loading"
+          elevation="7"
           class=" flex-grow-2 mr-4 mb-4"
-          :max-width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
-
+          :max-width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
         >
           <v-img
             v-if="!loading"
-            :src="imagesSrc.find(i => i.id === item.id).img"
+            :src="getImageSrc(item)"
             height="200px"
+            width="100%"
           ></v-img>
           <v-skeleton-loader
             v-else
-            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
             type="card-avatar"
           ></v-skeleton-loader>
           <v-fab-transition v-if="!loading">
@@ -33,7 +53,7 @@
               absolute
               top
               right
-              @click="$store.dispatch('deleteImages', item.id).then(() => listOfData)"
+              @click="$store.dispatch('deleteImages', item.id).then(() => listOfData())"
             >
               <v-icon>{{ icons.mdiDeleteCircle }}</v-icon>
             </v-btn>
@@ -48,18 +68,18 @@
                   <v-list-item-content class=" text-sm-h5">{{item.createdBy}}</v-list-item-content>
                 </v-list-item>
               </div>
-              <v-chip
-                class="mb-4 ml-4"
-                color="primary"
-                text-color="white"
-                v-if="item.orderedBy"
-              >
-                {{item.orderedBy}}
-              </v-chip>
             </div>
 
             <v-card-title class="pl-0 font-weight-bold">
               {{item.name}}
+            </v-card-title>
+            <v-card-title class="pl-0 font-weight-bold">
+              <v-chip
+                color="primary"
+                text-color="white"
+              >
+                {{item.booked ? item.bookedBy : item.status}}
+              </v-chip>
             </v-card-title>
             <v-simple-table dense >
               <template v-slot:default>
@@ -91,9 +111,9 @@
 <!--            <createDialog :prop-item="item" text-btn="Изменить" @success="listOfData"/>-->
             <div class="mt-4 mr-2 " style="min-width: 118px; max-width: 118px">{{item.createdAt | date}}</div>
             <v-spacer></v-spacer>
-            <v-btn class="rounded" rounded small color="primary" :loading="sellLoading" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
+            <v-btn class="rounded"  rounded small color="primary" :loading="sellLoading" :disabled="item.sold || workshop" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
+            <bookDialog v-if="!workshop" :item="item" @success="listOfData"/>
           </v-card-actions>
-
         </v-card>
       </v-hover>
     </div>
@@ -104,11 +124,17 @@
 <script>
 import { mdiCheckBold, mdiDeleteCircle, mdiArrowLeft } from '@mdi/js'
 import createDialog from '@/views/Department/components/createDialog'
+import bookDialog from '@/views/Department/components/bookDialog'
+import { admin, coordinator, florist, operator, superUser, workshop } from '@/helpers/roles'
 
 export default {
   name: 'allSets',
+  props: {
+    id: String
+  },
   components: {
-    createDialog
+    createDialog,
+    bookDialog
   },
   data:() => ({
     items: [],
@@ -116,20 +142,63 @@ export default {
     icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft},
     loading: false,
     sellLoading: false,
+    searchText: '',
+    selectCase: '',
   }),
   mounted() {
-   this.listOfData()
+      this.listOfData()
+  },
+  computed: {
+    florist() {
+      return florist()
+    },
+    coordinator() {
+      return coordinator()
+    },
+    admin() {
+      return admin()
+    },
+    operator() {
+      return operator()
+    },
+    workshop() {
+      return workshop()
+    },
+    superUser() {
+      return superUser()
+    },
+    filteredItems() {
+        return this.items.filter(item => {
+          return item.name.toLowerCase().includes(this.searchText.toLowerCase());
+        })
+          .sort((a, b) => {
+            if (this.selectCase === 'Новые') {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            } else if (this.selectCase === 'Старые') {
+              return new Date(a.createdAt) - new Date(b.createdAt);
+            }
+          });
+    }
   },
   methods: {
+    getImageSrc(item) {
+      const foundImage = this.imagesSrc.find(i => i.id === item.id);
+      if (foundImage) {
+        return foundImage.img;
+      } else {
+        // Обработка случая, когда изображение не найдено
+        return ''; // или другое значение по умолчанию
+      }
+    },
     listOfData() {
       this.loading = true
-      this.$store.dispatch('getAllSets', this.$route.params.id)
+      this.$store.dispatch('getAllSets', this.$props.id)
         .then(r => {
           this.items = r.data
           r.data.map(i => {
             this.image(i.id)
           })
-          setTimeout(() => this.loading = false, 1000)
+          this.loading = false
         })
     },
    image(v){
@@ -168,7 +237,7 @@ export default {
           const errorMessage = error.response ? error.response.data : 'Unknown error';
           this.$store.commit('setSnackbars', errorMessage);
         });
-    }
+    },
   }
 }
 </script>

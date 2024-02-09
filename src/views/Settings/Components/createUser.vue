@@ -6,6 +6,7 @@
     :headers="headers"
     :edited-items="editedItem"
     :show-to-edit="showToEdit"
+    :put-dispatch="'updateUser'"
     get-dispatch="getAllUser"
     post-dispatch="createUser"
     :filters="{date: ['date']}"
@@ -27,11 +28,13 @@ export default {
       {value: 'username', text: 'Имя'},
       {value: 'status', text: 'Статус'},
       {value: 'date', text: 'Дата'},
+      {value: 'actions', text: 'Действие'},
     ],
     editedItem: {
       "username": "",
       "password": "",
-      "roleId": 0
+      "roleId": 0,
+      id: 0,
     },
     showToEdit: [
 

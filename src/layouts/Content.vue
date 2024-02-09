@@ -36,12 +36,31 @@ import { mdiMagnify, mdiBellOutline, mdiGithub } from '@mdi/js'
 import VerticalNavMenu from './components/vertical-nav-menu/VerticalNavMenu.vue'
 import ThemeSwitcher from './components/ThemeSwitcher.vue'
 import AppBarUserMenu from './components/AppBarUserMenu.vue'
+import { removeToken } from '@/helpers/helpers'
+import router from '@/router'
 
 export default {
   components: {
     VerticalNavMenu,
     ThemeSwitcher,
     AppBarUserMenu,
+  },
+  data:() => ({
+    authLogin: false
+  }),
+  mounted() {
+    setTimeout(() => this.authLogin = true, 14400000 )
+  },
+  watch: {
+    authLogin(v) {
+      v && this.hideControls()
+    }
+  },
+  methods: {
+    hideControls() {
+      removeToken()
+      router.push({ name: 'pages-login' })
+    }
   },
   setup() {
     const isDrawerOpen = ref(null)

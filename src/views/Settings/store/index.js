@@ -109,7 +109,15 @@ export default {
       return baseURL.get('/storage/api/role/all')
     },
     createUser(_, payload) {
+      payload.password = payload.decryptedPassword
       return baseURL.post('/storage/api/admin/create', payload)
+    },
+    updateUser(_, payload) {
+      payload.password = payload.decryptedPassword
+      return baseURL.post(`/storage/api/admin/update/${payload.id}`, payload)
+    },
+    deleteUser(_, payload) {
+      return baseURL.post(`/storage/api/admin/delete/${payload.id}`)
     },
 
     // category-controller

@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="12">
-      <all-sets></all-sets>
+      <all-sets :id="this.$route.params.id"></all-sets>
     </v-col>
     <v-col cols="12">
       <departmentLogs/>

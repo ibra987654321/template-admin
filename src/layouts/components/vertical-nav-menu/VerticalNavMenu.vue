@@ -34,15 +34,23 @@
         :icon="icons.mdiHomeOutline"
       ></nav-menu-link>
       <nav-menu-link
+        v-if="admin || coordinator || superUser"
         title="Настройки"
         :to="{ name: 'settings' }"
         :icon="icons.mdiBookSettings"
       ></nav-menu-link>
-<!--      <nav-menu-link-->
-<!--        title="Склад"-->
-<!--        :to="{ name: 'storage' }"-->
-<!--        :icon="icons.mdiBookSettings"-->
-<!--      ></nav-menu-link>-->
+      <nav-menu-link
+        v-if="admin"
+        title="Отчет"
+        :to="{ name: 'report' }"
+        :icon="icons.mdiTable"
+      ></nav-menu-link>
+      <nav-menu-link
+        v-if="admin"
+        title="Пользователи"
+        :to="{ name: 'users' }"
+        :icon="icons.mdiAccount"
+      ></nav-menu-link>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -57,13 +65,15 @@ import {
   mdiFileOutline,
   mdiFormSelect,
   mdiAccountCogOutline,
-  mdiBookSettings
+  mdiBookSettings,
+  mdiAccount
 } from '@mdi/js'
 import NavMenuSectionTitle from './components/NavMenuSectionTitle.vue'
 import NavMenuGroup from './components/NavMenuGroup.vue'
 import NavMenuLink from './components/NavMenuLink.vue'
 import {decodeJWT} from "@/helpers/auth";
 import { getToken } from '@/helpers/helpers'
+import { admin, coordinator, florist, operator, superUser } from '@/helpers/roles'
 
 export default {
   components: {
@@ -75,6 +85,23 @@ export default {
     isDrawerOpen: {
       type: Boolean,
       default: null,
+    },
+  },
+  computed: {
+    florist() {
+      return florist()
+    },
+    coordinator() {
+      return coordinator()
+    },
+    admin() {
+      return admin()
+    },
+    operator() {
+      return operator()
+    },
+    superUser() {
+      return superUser()
     },
   },
   setup() {
@@ -89,6 +116,7 @@ export default {
         mdiFormSelect,
         mdiAccountCogOutline,
         mdiBookSettings,
+        mdiAccount,
       },
     }
   },

@@ -8,6 +8,9 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
+    meta: {
+      layout: 'blank',
+    },
     redirect: '/pages/login',
   },
   {
@@ -27,6 +30,18 @@ const routes = [
     name: 'storage',
     meta: { layout: 'main'},
     component: () => import('../views/Storage/index'),
+  },
+  {
+    path: '/report',
+    name: 'report',
+    meta: { layout: 'main'},
+    component: () => import('../views/report/index'),
+  },
+  {
+    path: '/users',
+    name: 'users',
+    meta: { layout: 'main'},
+    component: () => import('../views/UserController/index'),
   },
   {
   // , auth: true, authorize: [Role.User, Role.Admin]

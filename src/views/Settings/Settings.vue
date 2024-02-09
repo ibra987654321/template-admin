@@ -54,9 +54,6 @@
           @newItem="handleChange"
         ></use-table>
       </v-col>
-      <v-col v-if="admin" cols="12" sm="6">
-        <createUser/>
-      </v-col>
     </v-row>
   </v-card>
 
@@ -64,13 +61,11 @@
 
 <script>
 import useTable from '@/components/useDashboard/useTable'
-import createUser from '@/views/Settings/Components/createUser'
 import { admin } from '@/helpers/roles'
 export default {
   name: 'Settings',
   components: {
     useTable,
-    createUser
   },
   data:() => ({
     headers: [

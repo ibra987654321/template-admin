@@ -22,8 +22,8 @@
        <v-tab-item >
          <branchs></branchs>
          <hr class="my-10" color="#c48eff">
-         <div class="text-h5 text-center mb-5">Склад</div>
-         <products></products>
+         <div class="text-h5 text-center mb-5" v-if="admin || coordinator" >Склад</div>
+         <products v-if="admin || coordinator" ></products>
        </v-tab-item>
        <v-tab-item>
          <loggers></loggers>
@@ -37,6 +37,7 @@
 import loggers from '@/views/Storage/components/loggers'
 import products from '@/views/Storage/components/products'
 import branchs from '@/views/Storage/components/branchs'
+import { admin, coordinator, florist, operator } from '@/helpers/roles'
 export default {
   name: 'index',
   components: {
@@ -54,7 +55,21 @@ export default {
         title: 'История',
       },
     ],
-  })
+  }),
+  computed: {
+    florist() {
+      return florist()
+    },
+    coordinator() {
+      return coordinator()
+    },
+    admin() {
+      return admin()
+    },
+    operator() {
+      return operator()
+    },
+  },
 }
 </script>
 

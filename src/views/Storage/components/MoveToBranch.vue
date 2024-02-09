@@ -10,12 +10,22 @@
         v-bind="attrs"
         v-on="on"
         x-large
-      >Добавить</v-btn>
+      >Переместить</v-btn>
     </template>
     <template v-slot:default="dialog">
       <v-card>
         <v-card-title class="mb-8" >Добавление товара в склад</v-card-title>
         <v-card-text class="d-flex justify-space-around">
+          <v-select
+            v-model="branch"
+            label="Филиалы"
+            :items="branches"
+            item-value="id"
+            item-text="name"
+            hide-details
+            outlined
+            class="mr-2"
+          ></v-select>
           <v-select
             v-model="categoryM"
             label="Тип"
@@ -52,7 +62,7 @@
             color="primary"
             @click="save"
             :disabled="!valid"
-          >Создать</v-btn>
+          >Переместить</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -61,10 +71,11 @@
 
 <script>
 export default {
-  name: 'dialogsForAddProduct',
+  name: 'MoveToBranch',
   data:() => ({
     dialog: false,
     categoryM: null,
+    branch: null,
     unitOfMeasurement: null,
     item: {
       "productId": null,
@@ -72,8 +83,15 @@ export default {
     },
     items: [],
     category: [],
+    branches: [],
   }),
   mounted() {
+    this.$store.dispatch('getAllBranch')
+      .then(r => {
+        this.branches = r.data
+        this.branch = 1
+      })
+      .catch(e => this.$store.commit('setSnackbars', e.message))
     this.$store.dispatch('getCategory')
       .then(r => {
         this.category = r.data
@@ -100,7 +118,7 @@ export default {
   },
   methods: {
     save() {
-      this.$store.dispatch('arrivalOfGoods', this.item)
+      this.$store.dispatch('moveToBranchFromStore', {item: this.item, to: this.branch})
         .then(r => {
           this.$emit('success', r.data)
           this.item = {

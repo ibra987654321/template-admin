@@ -1,7 +1,7 @@
 <template>
 <div class="d-flex justify-space-around align-center" :class="$vuetify.breakpoint.mobile && 'flex-column'">
   <dialogs-for-add-product @success="loadData()"></dialogs-for-add-product>
-
+  <move-to-branch @success="loadData()"></move-to-branch>
   <v-card class=" elevation-9" max-width="400" v-for="item in listOfData">
     <v-card-title class="headline">{{ item.name }}</v-card-title>
     <v-card-subtitle>{{ item.amount }}</v-card-subtitle>
@@ -17,10 +17,11 @@
 </template>
 
 <script>
+import MoveToBranch from '@/views/Storage/components/MoveToBranch'
 import dialogsForAddProduct from '@/views/Storage/components/dialogsForAddProduct'
 export default {
   name: 'products',
-  components: {dialogsForAddProduct},
+  components: {dialogsForAddProduct, MoveToBranch},
   data:() => ({
     listOfData: []
   }),

@@ -29,6 +29,7 @@ export default {
     uploadImg(_, payload) {
       const formData = new FormData()
       formData.append('multipartFile', payload.file )
+      console.log(formData)
       return axios.post(`http://176.126.164.208:8070/storage/api/set/upload/${payload.id}`,
         formData,
         {
@@ -40,6 +41,9 @@ export default {
     },
     saveToSell(_, payload) {
         return baseURL.post(`/storage/api/set/sell/${payload}`)
+    },
+    bookToSell(_, payload) {
+        return baseURL.post(`/storage/api/set/book`, payload)
     },
     saveToDepartment(_, payload) {
       return baseURL.post('/storage/api/goods/saveToDepartment/' + payload.to, payload)

@@ -14,11 +14,11 @@
               <div class="text-overline mb-4">
                 {{item.name}}
               </div>
-              <moveEachBranch :id="item.id"/>
+              <moveEachBranch v-if="admin || coordinator || superUser" :id="item.id"/>
             </div>
 
-            <div>Товары</div>
-            <v-simple-table dense  >
+            <div v-if="admin || coordinator || superUser" >Товары</div>
+            <v-simple-table dense v-if="admin || coordinator || superUser"   >
               <template v-slot:default>
                 <tbody>
                 <tr
@@ -31,8 +31,8 @@
                 </tbody>
               </template>
             </v-simple-table>
-            <div>Наборы</div>
-          <get-all-sets-for-branch :id="item.id"></get-all-sets-for-branch>
+            <div v-if="admin || coordinator || superUser" >Наборы</div>
+          <get-all-sets-for-branch v-if="admin || coordinator || superUser"  :id="item.id"></get-all-sets-for-branch>
           </v-list-item-content>
 
         </v-list-item>
@@ -56,6 +56,7 @@ import { getToken } from '@/helpers/helpers'
 import { environment, SETTING, STORAGE } from '@/environments/endPoint'
 import getAllSetsForBranch from '@/views/Storage/components/branchComponents/getAllSetsForBranch'
 import moveEachBranch from '@/views/Storage/components/moveEachBranch'
+import { admin, coordinator, florist, operator, superUser } from '@/helpers/roles'
 export default {
   name: 'branchs',
   components: {getAllSetsForBranch, moveEachBranch},
@@ -65,7 +66,23 @@ export default {
   mounted() {
     this.initEventSource()
   },
-
+  computed: {
+    florist() {
+      return florist()
+    },
+    coordinator() {
+      return coordinator()
+    },
+    admin() {
+      return admin()
+    },
+    operator() {
+      return operator()
+    },
+    superUser() {
+      return superUser()
+    },
+  },
   methods: {
     initEventSource() {
       this.eventSource = new EventSource(`${environment.main }${SETTING}/branch/all/goods/byFlux?token=${getToken()}`);

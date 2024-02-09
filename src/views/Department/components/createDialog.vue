@@ -9,11 +9,59 @@
         color="primary"
         v-bind="attrs"
         v-on="on"
+        :small="$vuetify.breakpoint.mobile"
       >{{$props.textBtn}}</v-btn>
     </template>
     <template v-slot:default="dialog">
       <v-card>
-        <v-card-title class="mb-8" >Добавление </v-card-title>
+        <div class="d-flex">
+          <v-card-title class="mb-8" >Добавление </v-card-title>
+          <v-card-title class="mb-8" >
+            <v-dialog
+              transition="dialog-bottom-transition"
+              max-width="600"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  color="primary"
+                  v-bind="attrs"
+                  v-on="on"
+                  small
+                >Сколько осталось</v-btn>
+              </template>
+              <template v-slot:default="dialog">
+                <v-card>
+                  <v-toolbar
+                    color="primary"
+                    dark
+                  >Количество товаров в этом филиале</v-toolbar>
+                  <v-card-text>
+                    <div class="pa-4">
+                      <v-chip-group
+                        active-class="primary--text"
+                        column
+                      >
+                        <v-chip
+                          v-for="(tag, idx) in goods"
+                          :key="idx"
+                        >
+                          {{ tag.name }} | {{tag.amount}}
+                        </v-chip>
+                      </v-chip-group>
+                    </div>
+                  </v-card-text>
+                  <v-card-actions class="justify-end">
+                    <v-btn
+                      text
+                      @click="dialog.value = false"
+                    >Закрыть</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+            </v-dialog>
+          </v-card-title>
+        </div>
+
         <v-card-text class="d-flex justify-space-around">
           <v-row>
             <v-col cols="12" sm="6">
@@ -138,7 +186,8 @@
               </v-row>
             </v-col>
             <v-col cols="6">
-              <input type="file" @change="handleFileChange" accept="image/*" />
+<!--              <input type="file" @change="handleFileChange" accept="image/*"  />-->
+              <v-file-input outlined label="Выбрать фото" @change="handleFileChange"  ref="fileInput" type="file" ></v-file-input>
             </v-col>
           </v-row>
         </v-card-text>
@@ -161,17 +210,20 @@
 
 <script>
 import {mdiMinus, mdiPlus} from '@mdi/js'
+import { getToken } from '@/helpers/helpers'
 export default {
   name: 'createDialog',
   props: {
     textBtn: String,
-    propItem: Object
+    propItem: Object,
+    propItem1: Object,
   },
   data:() => ({
     dialog: false,
     loading: false,
     categoryIdLoading: false,
     productName: [],
+    goods: [],
     materialComponent: [],
     categoryM: null,
     unitOfMeasurement: null,
@@ -225,6 +277,7 @@ export default {
             this.productName = r.data
           })
           .catch(e => this.$store.commit('setSnackbars', e.message))
+        this.initEventSource()
       }
       if (this.propItem) {
         this.item.name = this.propItem.name
@@ -258,10 +311,13 @@ export default {
           this.$store.commit('setSnackbars', e.message)
         })
       this.item.name = this.productName.find(i => i.id === v).name
+    },
+    'newMessage.file'() {
+      // this.compressImage(this.newMessage.file, (1024 * 1024))
     }
   },
   methods: {
-    save() {
+   save () {
       this.loading = true
       this.item.branchId = this.$route.params.id
       if (this.item.status !== 'Заказ') {
@@ -298,10 +354,10 @@ export default {
           delete i.productItems
         })
         this.$store.dispatch('createSet', this.item)
-          .then(r => {
+          .then(async r => {
             if (this.newMessage.file !== null) {
               this.$store.dispatch('uploadImg',{
-                file: this.newMessage.file,
+                file: await this.compressImage(this.newMessage.file, 1024 * 1024 * 3),
                 id: r.data.id
               })
                 .then(() => {
@@ -316,14 +372,22 @@ export default {
                     "consumables": [],
                     "ingredients": [],
                   }
+                  this.$refs.fileInput.value = null;
+                  this.selected = ''
                   this.dialog = false
                   this.loading = false
+                  this.$store.commit('setSnackbars', 'Успешно создано');
+                })
+                .catch(() => {
+                  this.dialog = false
+                  this.loading = false
+                  this.$store.commit('setSnackbars', 'Ошибка при загрузке картинки');
                 })
               return
             }
             this.dialog = false
             this.loading = false
-
+            this.$store.commit('setSnackbars', 'Успешно создано');
           })
           .catch(error => {
             const errorMessage = error.response ? error.response.data : 'Unknown error';
@@ -334,7 +398,7 @@ export default {
 
     },
     handleFileChange(event) {
-      const file = event.target.files[0];
+      const file = event;
       if (file) {
         this.newMessage.file = file;
         const reader = new FileReader();
@@ -343,6 +407,69 @@ export default {
         };
         reader.readAsDataURL(file);
       }
+    },
+    compressImage(file, targetSizeInBytes) {
+      const maxQuality = 1.0;
+      let currentQuality = 0.8; // Начальный уровень качества, можно настроить в соответствии с вашими требованиями
+
+      return new Promise((resolve, reject) => {
+        if (file.size <= targetSizeInBytes) {
+          // Если размер файла уже меньше 1 МБ, просто возвращаем его без изменений
+          resolve(file);
+          return;
+        }
+
+        const attemptCompression = () => {
+          const reader = new FileReader();
+
+          reader.onload = (event) => {
+            const image = new Image();
+
+            image.onload = () => {
+              const canvas = document.createElement('canvas');
+              const ctx = canvas.getContext('2d');
+
+              const maxWidth = 800;
+              const maxHeight = 600;
+
+              let width = image.width;
+              let height = image.height;
+
+              if (width > maxWidth) {
+                height *= maxWidth / width;
+                width = maxWidth;
+              }
+
+              if (height > maxHeight) {
+                width *= maxHeight / height;
+                height = maxHeight;
+              }
+
+              canvas.width = width;
+              canvas.height = height;
+
+              ctx.drawImage(image, 0, 0, width, height);
+
+              canvas.toBlob((blob) => {
+                if (blob.size <= targetSizeInBytes || currentQuality >= maxQuality) {
+                  // Если размер файла удовлетворяет требованиям или достигнут максимальный уровень качества
+                  resolve(new File([blob], file.name, { type: file.type, lastModified: file.lastModified }));
+                } else {
+                  // Если размер файла все еще слишком большой, уменьшаем уровень качества и повторяем попытку
+                  currentQuality += 0.1; // Можете настроить этот шаг
+                  attemptCompression();
+                }
+              }, 'image/jpeg', currentQuality);
+            };
+
+            image.src = event.target.result;
+          };
+
+          reader.readAsDataURL(file);
+        };
+
+        attemptCompression();
+      });
     },
     addIngredient() {
       const newIngredient = { categoryM: 0, productId: 0, amount: null, productItems: [] };
@@ -377,6 +504,12 @@ export default {
           (item) => item.materialId !== checkbox.id
         );
       }
+    },
+    initEventSource() {
+      this.$store.dispatch('currentAmountByGoods', this.$props.propItem1.stock.id)
+        .then(r => {
+          this.goods = r.data
+        })
     },
   },
 
