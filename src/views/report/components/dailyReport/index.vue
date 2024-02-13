@@ -12,6 +12,7 @@
         item-value="id"
         item-text="name"
         hide-details
+        clearable
       ></v-select>
     </v-col>
     <v-col cols="6" sm="4">
@@ -23,9 +24,10 @@
         item-value="id"
         item-text="name"
         hide-details
+        clearable
       ></v-select>
     </v-col>
-    <v-col cols="12" sm="4">
+    <v-col cols="12" sm="4" v-if="tabs === 0">
       <v-select
         v-model="postData.productId"
         outlined
@@ -34,10 +36,11 @@
         item-value="id"
         item-text="name"
         hide-details
+        clearable
       ></v-select>
     </v-col>
     <v-col cols="12">
-      <v-tabs centered hide-slider>
+      <v-tabs v-model="tabs" centered hide-slider>
         <v-tab>
           <v-btn color="primary" >
             По дням
@@ -59,7 +62,7 @@
           </v-card>
         </v-tab-item>
         <v-tab-item>
-          <v-card flat>
+          <v-card>
             <v-card-text>
               <useTable
                 :headers="productHeader"
@@ -84,6 +87,7 @@ export default {
     useTable,
   },
   data:() => ({
+    tabs: '',
     items: [],
     productsItem: [],
     branches: [],
@@ -126,18 +130,29 @@ export default {
   },
   watch: {
     done() {
-      this.valid && this.loadInData()
+      if (this.valid) {
+        this.loadInData()
+        this.loadInDataProduct()
+      }
     },
     start() {
-      this.valid && this.loadInData()
+      if (this.valid) {
+        this.loadInData()
+        this.loadInDataProduct()
+      }
     },
-    // category(v) {
-    //   this.$store.dispatch('getProduct', v)
-    //     .then(r => {
-    //       this.products = r.data
-    //     })
-    // },
+    'postData.branchId'() {
+      if (this.tabs === 0 && this.postData.productId && this.postData.categoryId) {
+        this.loadInData()
+      } else if (this.tabs === 1 && this.postData.categoryId) {
+        this.loadInDataProduct()
+      }
+    },
     'postData.productId'() {
+      if (!this.postData.branchId) {
+        this.$store.commit('setSnackbars', 'Выберите филиал!')
+        return
+      }
       this.loadInData()
     },
     'postData.categoryId'(v) {
@@ -145,6 +160,7 @@ export default {
         .then(r => {
           this.products = r.data
           this.loadInDataProduct()
+          this.loadInData()
         })
 
     }

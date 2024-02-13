@@ -34,7 +34,7 @@
     </v-card-text>
     <v-card-text class="d-flex">
       <v-btn color="primary" small @click="$router.push({path: '/department-detail/' + item.id})">Подробнее</v-btn>
-     <div v-if="admin || florist || superUser" class="ml-5">
+     <div v-if="admin || florist || superUser || coordinator" class="ml-5">
        <to-disposal  :department-id="$props.item.id"></to-disposal>
      </div>
     </v-card-text>
