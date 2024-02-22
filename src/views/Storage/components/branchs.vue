@@ -14,7 +14,7 @@
               <div class="text-overline mb-4">
                 {{item.name}}
               </div>
-              <moveEachBranch v-if="admin || coordinator || superUser" :id="item.id"/>
+              <moveEachBranch v-if="admin || coordinator || superUser || florist" :id="item.id"/>
             </div>
 
             <div v-if="admin || coordinator || superUser" >Товары</div>

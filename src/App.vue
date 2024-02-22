@@ -13,6 +13,7 @@ import { useRouter } from '@/utils'
 import LayoutBlank from '@/layouts/Blank.vue'
 import LayoutContent from '@/layouts/Content.vue'
 import TheSnackbars from '@/components/TheSnackbars'
+import { decodeJWT } from '@/helpers/auth'
 
 export default {
   components: {
@@ -20,11 +21,19 @@ export default {
     LayoutContent,
     TheSnackbars,
   },
+  data:() => ({
+  }),
   mounted() {
     this.$vuetify.theme.dark = true
+    const expDate = decodeJWT().exp
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+
+  },
+  watch: {
+
   },
   setup() {
-    const { route, router } = useRouter()
+       const { route, router } = useRouter()
 
     const resolveLayout = computed(() => {
 
