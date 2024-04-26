@@ -1,6 +1,6 @@
 <template>
-  <v-row dense>
-    <v-col v-for="item in branches"  :class="$vuetify.breakpoint.mobile ? 'mb-4 px-2' : ''">
+  <v-row dense class="px-5">
+    <v-col cols="3" v-for="item in branches"  :class="$vuetify.breakpoint.mobile ? 'mb-4 px-2' : ''">
       <v-card
         class="mx-auto d-flex flex-column justify-space-between elevation-10"
 

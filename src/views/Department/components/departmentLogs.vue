@@ -19,6 +19,7 @@ export default {
   data:() => ({
     header: [
       {value: 'index', text: '#'},
+      {text: 'Название', value: 'name'},
       {text: 'Количество', value: 'amount'},
       {text: 'Дата', value: 'createdAt'},
       {text: 'Кто', value: 'createdBy'},

@@ -13,7 +13,7 @@ import { useRouter } from '@/utils'
 import LayoutBlank from '@/layouts/Blank.vue'
 import LayoutContent from '@/layouts/Content.vue'
 import TheSnackbars from '@/components/TheSnackbars'
-import { decodeJWT } from '@/helpers/auth'
+import { decodeJWT, logOut } from '@/helpers/auth'
 
 export default {
   components: {
@@ -22,15 +22,33 @@ export default {
     TheSnackbars,
   },
   data:() => ({
+    expDate: '', // Дата окончания токена
+    currentTimestamp: 0, // Текущее время
   }),
+  created() {
+    // Инициализируем значения переменных
+    this.expDate = decodeJWT().exp;
+    this.currentTimestamp = Math.floor(Date.now() / 1000);
+  },
   mounted() {
     this.$vuetify.theme.dark = true
-    const expDate = decodeJWT().exp
-    const currentTimestamp = Math.floor(Date.now() / 1000);
-
   },
   watch: {
-
+    // Следим за изменениями переменных и проверяем истек ли токен
+    expDate: function(newExpDate) {
+      this.checkTokenExpiration();
+    },
+    currentTimestamp: function(newTimestamp) {
+      this.checkTokenExpiration();
+    }
+  },
+  methods: {
+    checkTokenExpiration() {
+      if (this.expDate < this.currentTimestamp) {
+        // Токен истек, выполняем необходимые действия, например, выход из системы
+        logOut()
+      }
+    },
   },
   setup() {
        const { route, router } = useRouter()

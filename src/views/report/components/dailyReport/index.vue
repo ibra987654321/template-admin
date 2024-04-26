@@ -40,17 +40,29 @@
       ></v-select>
     </v-col>
     <v-col cols="12">
-      <v-tabs v-model="tabs" centered hide-slider>
-        <v-tab>
-          <v-btn color="primary" >
-            По дням
-          </v-btn>
-        </v-tab>
-        <v-tab>
-          <v-btn color="primary" >
-            По продуктам
-          </v-btn>
-        </v-tab>
+      <v-btn
+        color="info"
+        small
+        :disabled="!postData.branchId"
+        :loading="$store.state.report.loading"
+        @click="$store.dispatch('downloadExcel', postData.branchId)"
+      >Скачать Excel</v-btn>
+    </v-col>
+    <v-col cols="12">
+      <v-tabs v-model="tabs">
+        <div class="w-full d-flex justify-center">
+          <v-tab>
+            <v-btn color="primary" >
+              По дням
+            </v-btn>
+          </v-tab>
+          <v-tab>
+            <v-btn color="primary" >
+              По продуктам
+            </v-btn>
+          </v-tab>
+        </div>
+
         <v-tab-item>
           <v-card >
             <v-card-text>

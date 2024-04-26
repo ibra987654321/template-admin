@@ -26,10 +26,16 @@
     </v-list-item>
     <v-divider class="mx-4"></v-divider>
     <v-card-text>
+      <v-text-field
+        v-model="search"
+        outlined
+        dense
+        class="mb-1"
+        label="Поиск"
+      ></v-text-field>
       <v-data-table
         :headers="[  { text: 'Название', value: 'name' }, { text: 'Кол-во', value: 'amount' },]"
-        :items="goods"
-        hide-default-footer
+        :items="filteredGoods"
       ></v-data-table>
     </v-card-text>
     <v-card-text class="d-flex">
@@ -60,7 +66,8 @@ export default {
     toDisposal
   },
   data:() => ({
-    goods: []
+    goods: [],
+    search: ''
   }),
   mounted() {
     this.initEventSource()
@@ -78,6 +85,18 @@ export default {
     superUser() {
       return superUser()
     },
+    filteredGoods() {
+      return this.goods.filter(item =>
+        item.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+    }
+  },
+  watch: {
+    search(v) {
+      if (!v) {
+        this.initEventSource()
+      }
+    }
   },
   methods: {
     deleteItem() {

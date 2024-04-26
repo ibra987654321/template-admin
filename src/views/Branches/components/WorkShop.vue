@@ -35,6 +35,7 @@
       <v-data-table
         :headers="[  { text: 'Название', value: 'name' }, { text: 'Кол-во', value: 'amount' },]"
         :items="sets"
+        :footer-props="{itemsPerPageOptions: [100,20]}"
         hide-default-footer
       ></v-data-table>
     </v-card-text>

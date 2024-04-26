@@ -10,11 +10,11 @@
         v-bind="attrs"
         v-on="on"
         x-large
-      >Переместить</v-btn>
+      >Удалить</v-btn>
     </template>
     <template v-slot:default="dialog">
       <v-card>
-        <v-card-title class="mb-8" >Перемещение из склада</v-card-title>
+        <v-card-title class="mb-8" >Удаление из склада</v-card-title>
         <v-card-text class="d-flex justify-space-around">
           <v-select
             v-model="branch"
@@ -77,7 +77,7 @@
             @click="save"
             :loading="loading"
             :disabled="!valid || loading"
-          >Переместить</v-btn>
+          >Удалить</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -86,7 +86,7 @@
 
 <script>
 export default {
-  name: 'MoveToBranch',
+  name: 'DeleteProductDialog',
   data:() => ({
     dialog: false,
     loading: false,
@@ -151,7 +151,7 @@ export default {
   methods: {
     save() {
       this.loading = true
-      this.$store.dispatch('moveToBranchFromStore', {item: this.item, to: this.branch})
+      this.$store.dispatch('deleteItemOnStorage', this.item)
         .then(r => {
           this.$emit('success', r.data)
           this.item = {

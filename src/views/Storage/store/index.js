@@ -23,6 +23,9 @@ export default {
         end: moment(state.rootState.end).format().slice(0, 19),
       }
       return baseURL.post(`/storage/api/findAllByCreatedAtBetween`, data)
+    },
+    deleteItemOnStorage(_, payload) {
+      return baseURL.post(`/storage/api/removeFromStorage`, payload)
     }
   },
   mutations: {},

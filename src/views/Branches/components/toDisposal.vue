@@ -13,8 +13,6 @@
         small
         @click="dialog = true"
       > Утилизировать</v-btn>
-
-
     </template>
     <template v-slot:default="dialog">
       <v-card>

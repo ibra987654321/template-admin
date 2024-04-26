@@ -7,7 +7,6 @@
         indeterminate
       ></v-progress-linear>
     </template>
-
     <v-img
       height="250"
       src="https://images.unsplash.com/photo-1525640788966-69bdb028aa73?q=80&w=3867&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -25,6 +24,7 @@
       <v-data-table
         :headers="[  { text: 'Название', value: 'name' }, { text: 'Кол-во', value: 'amount' },]"
         :items="sets"
+        :footer-props="{itemsPerPageOptions: [100,20]}"
         hide-default-footer
       ></v-data-table>
 <!--      <updateDialog  :item="item" @success="$emit('successUpdate')"/>-->
