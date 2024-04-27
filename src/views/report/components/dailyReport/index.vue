@@ -27,7 +27,7 @@
         clearable
       ></v-select>
     </v-col>
-    <v-col cols="12" sm="4" v-if="tabs === 0">
+    <v-col cols="12" sm="4" v-if="tabs !== 1">
       <v-select
         v-model="postData.productId"
         outlined
@@ -58,6 +58,12 @@
           </v-tab>
           <v-tab>
             <v-btn color="primary" >
+              По наборам
+            </v-btn>
+          </v-tab>
+
+          <v-tab>
+            <v-btn color="primary" >
               По продуктам
             </v-btn>
           </v-tab>
@@ -83,8 +89,17 @@
             </v-card-text>
           </v-card>
         </v-tab-item>
+        <v-tab-item>
+          <v-card>
+            <v-card-text>
+              <useTable
+                :headers="usageHeader"
+                :items="usageItem"
+              />
+            </v-card-text>
+          </v-card>
+        </v-tab-item>
       </v-tabs>
-
     </v-col>
   </v-row>
 </template>
@@ -103,6 +118,7 @@ export default {
     items: [],
     productsItem: [],
     branches: [],
+    usageItem: [],
     categories: [],
     category: '',
     products: [],
@@ -124,7 +140,11 @@ export default {
     productHeader: [
       {text: 'Название', value: 'name'},
       {text: 'Количество', value: 'amount'},
-    ]
+    ],
+    usageHeader: [
+      {text: 'Дата', value: 'name'},
+      {text: 'Количество', value: 'amount'},
+    ],
   }),
   computed: {
     done() {
@@ -145,17 +165,20 @@ export default {
       if (this.valid) {
         this.loadInData()
         this.loadInDataProduct()
+        this.dailyGoodsUsageForSets()
       }
     },
     start() {
       if (this.valid) {
         this.loadInData()
         this.loadInDataProduct()
+        this.dailyGoodsUsageForSets()
       }
     },
     'postData.branchId'() {
-      if (this.tabs === 0 && this.postData.productId && this.postData.categoryId) {
+      if (this.tabs !== 1 && this.postData.productId && this.postData.categoryId) {
         this.loadInData()
+        this.dailyGoodsUsageForSets()
       } else if (this.tabs === 1 && this.postData.categoryId) {
         this.loadInDataProduct()
       }
@@ -166,6 +189,7 @@ export default {
         return
       }
       this.loadInData()
+      this.dailyGoodsUsageForSets()
     },
     'postData.categoryId'(v) {
       this.$store.dispatch('getProduct', v)
@@ -202,7 +226,13 @@ export default {
         .then(r => {
           this.productsItem = r.data
         })
-    }
+    },
+    dailyGoodsUsageForSets() {
+      this.$store.dispatch('dailyGoodsUsageForSets', this.postData)
+        .then(r => {
+          this.usageItem = r.data
+        })
+    },
   }
 }
 </script>

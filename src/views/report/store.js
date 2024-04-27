@@ -22,12 +22,33 @@ export default {
       }
       return baseURL.post(`/storage/api/goods/report/${payload.branchId}/${payload.productId}`, data)
     },
+    getAmountByCreatedBy(state, payload) {
+      const data = {
+        start: moment(state.rootState.start).format().slice(0, 19),
+        end: moment(state.rootState.end).format().slice(0, 19),
+      }
+      return baseURL.post(`/storage/api/set/amountByCreatedBy`, data)
+    },
+    getAmountBySetNameAndCreatedBy (state, payload) {
+      const data = {
+        start: moment(state.rootState.start).format().slice(0, 19),
+        end: moment(state.rootState.end).format().slice(0, 19),
+      }
+      return baseURL.post(`/storage/api/set/amountByCreatedBy/setName?createdBy=${payload}`, data)
+    },
     getProductReports(state, payload) {
       const data = {
         start: moment(state.rootState.start).format().slice(0, 19),
         end: moment(state.rootState.end).format().slice(0, 19),
       }
       return baseURL.post(`/storage/api/set/sold/report/${payload.branchId}/${payload.categoryId}`, data)
+    },
+    dailyGoodsUsageForSets(state, payload) {
+      const data = {
+        start: moment(state.rootState.start).format().slice(0, 19),
+        end: moment(state.rootState.end).format().slice(0, 19),
+      }
+      return baseURL.post(`/storage/api/goods/report/dailyGoodsUsageForSets/${payload.branchId}/${payload.productId}`, data)
     },
     downloadExcel(state, payload) {
       state.commit('load', true)

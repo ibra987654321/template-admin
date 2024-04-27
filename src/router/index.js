@@ -58,6 +58,13 @@ const routes = [
     component: () => import('@/views/Department/index'),
   },
   {
+    // , auth: true, authorize: [Role.User, Role.Admin]
+    path: '/employee-report',
+    name: 'employee-report',
+    meta: { layout: 'main'},
+    component: () => import('@/views/report/components/reportByEmployee/reportByEmployee'),
+  },
+  {
     path: '/pages/login',
     name: 'pages-login',
     component: () => import('../views/pages/Login.vue'),

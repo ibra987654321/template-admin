@@ -47,6 +47,12 @@
       ></nav-menu-link>
       <nav-menu-link
         v-if="admin"
+        title="Отчет по сотрудникам"
+        :to="{ name: 'employee-report' }"
+        :icon="icons.mdiTable"
+      ></nav-menu-link>
+      <nav-menu-link
+        v-if="admin"
         title="Пользователи"
         :to="{ name: 'users' }"
         :icon="icons.mdiAccount"

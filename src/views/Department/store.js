@@ -21,6 +21,9 @@ export default {
     getImages(_, payload) {
       return imageURL.get(`/storage/api/media/photo/${payload}`)
     },
+    disposalSetById(_, payload) {
+      return baseURL.post(`/storage/api/set/disposal/${payload}`)
+    },
     deleteImages({ commit }, payload) {
       imageURL.delete(`/storage/api/set/delete/photo/${payload}`)
         .then(() => commit('setSnackbars', 'Успешно удалено'))

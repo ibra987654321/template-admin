@@ -26,115 +26,218 @@
     ></v-select>
   </div>
 
-  <div class="mt-2 d-flex flex-wrap">
+    <div class="">
+      <v-dialog v-model='dialog' :max-width="$vuetify.breakpoint.mobile ? 400 : 600 ">
+        <v-card
+          :loading="loading"
+          elevation="7"
+        >
+          <v-icon
+            large
+            @click='dialog = false'
+            style="
+              position: absolute;
+              z-index: 10;
+              right: 0;
 
-    <v-hover v-slot="{ hover }" v-for="item in filteredItems">
-      <v-card
-        :loading="loading"
-        elevation="7"
-        class=" flex-grow-2 mr-4 mb-4"
-        :max-width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
-      >
-        <v-img
-          v-if="!loading"
-          :src="imagesSrc.find(i => i.id === item.id).img"
-          height="200px"
-          width="100%"
-        ></v-img>
-        <v-skeleton-loader
-          v-else
-          :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
-          type="card-avatar"
-        ></v-skeleton-loader>
-        <v-fab-transition v-if="!loading">
-          <v-btn
-            v-show="hover"
-            color="pink"
-            fab
-            dark
-            small
-            absolute
-            top
-            right
-            @click="$store.dispatch('deleteImages', item.id).then(() => listOfData())"
+            " >{{icons.mdiClose}}</v-icon>
+          <v-dialog
+            v-if="!imgLoading"
+            transition="dialog-bottom-transition"
+            max-width="700"
           >
-            <v-icon>{{ icons.mdiDeleteCircle }}</v-icon>
-          </v-btn>
-        </v-fab-transition>
-        <v-card-text class="mt-4" v-if="!loading">
-          <div class="d-flex align-center justify-space-between">
-            <div class="d-flex">
-              <v-avatar size="40px">
-                <v-img :src="require('@/assets/images/avatars/2.png')"></v-img>
-              </v-avatar>
-              <v-list-item>
-                <v-list-item-content class=" text-sm-h5">{{item.createdBy}}</v-list-item-content>
-              </v-list-item>
-            </div>
-            <v-chip
-              class="mb-4 ml-4"
-              color="secondary"
-              text-color="white"
-            >
-              {{item.booked ? item.bookedBy : item.status}}
-            </v-chip>
-          </div>
-
-          <v-card-title class="pl-0 font-weight-bold">
-            {{item.name}}
-          </v-card-title>
-          <v-simple-table dense >
-            <template v-slot:default>
-              <tbody>
-              <tr
-                v-for="ingredient in item.ingredients"
-                :key="ingredient.name"
+            <template v-slot:activator="{ on, attrs }">
+              <v-img
+                :src="imagesSrc.img"
+                height="200px"
+                width="100%"
+                v-bind="attrs"
+                v-on="on"
+                style="cursor:pointer;"
               >
-                <td class="pl-0" style="font-size: 18px;">{{ ingredient.product.name }}</td>
-                <td class="pr-0" style="font-size: 18px;">{{ ingredient.amount }}</td>
-              </tr>
-              </tbody>
+              </v-img>
             </template>
-          </v-simple-table>
-        </v-card-text>
-        <div v-else>
+            <template v-slot:default="dialog">
+              <v-img
+                :src="imagesSrc.img"
+                width="100%"
+                max-height="100%"
+              ></v-img>
+            </template>
+          </v-dialog>
           <v-skeleton-loader
-            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
-            type="article"
+            v-else
+            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
+            type="card-avatar"
           ></v-skeleton-loader>
+          <v-card-text class="mt-4" v-if="!loading">
+            <div class="d-flex align-center justify-space-between">
+              <div class="d-flex">
+                <v-avatar size="40px">
+                  <v-img :src="require('@/assets/images/avatars/2.png')"></v-img>
+                </v-avatar>
+                <v-list-item>
+                  <v-list-item-content class="text-sm-h5">{{item.createdBy}}</v-list-item-content>
+                </v-list-item>
+              </div>
+            </div>
 
-        </div>
-        <v-skeleton-loader
-          v-if="loading"
-          :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
-          type="actions"
-        ></v-skeleton-loader>
-        <v-card-actions v-else >
-          <div class="mt-4 mr-2 " style="min-width: 118px; max-width: 118px">{{item.createdAt | date}}</div>
-          <v-spacer></v-spacer>
-        </v-card-actions>
-      </v-card>
-    </v-hover>
-  </div>
+            <v-card-title class="pl-0 font-weight-bold">
+              {{item.name}}
+            </v-card-title>
+            <v-card-title class="pl-0 font-weight-bold">
+              <v-chip
+                color="primary"
+                text-color="white"
+              >
+                {{item.booked ? item.bookedBy : item.status}}
+              </v-chip>
+            </v-card-title>
+            <v-simple-table dense >
+              <template v-slot:default>
+                <tbody>
+                <tr
+                  v-for="ingredient in item.ingredients"
+                  :key="ingredient.name"
+                >
+                  <td class="pl-0" style="font-size: 18px;">{{ ingredient.product.name }}</td>
+                  <td class="pr-0" style="font-size: 18px;">{{ ingredient.amount }}</td>
+                </tr>
+                </tbody>
+              </template>
+            </v-simple-table>
+          </v-card-text>
+          <div v-else>
+            <v-skeleton-loader
+              :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+              type="article"
+            ></v-skeleton-loader>
+
+          </div>
+          <v-skeleton-loader
+            v-if="loading"
+            :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 320"
+            type="actions"
+          ></v-skeleton-loader>
+          <v-card-actions v-else >
+            <!--            <createDialog :prop-item="item" text-btn="Изменить" @success="listOfData"/>-->
+            <div class="mt-4 mr-2 " style="min-width: 118px; max-width: 118px">{{item.createdAt | date}}</div>
+            <v-spacer></v-spacer>
+            <div class="flex-grow-1">
+              <v-btn class="rounded"  rounded small color="primary" :loading="sellLoading" :disabled="item.sold || workshop" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
+              <v-dialog
+                v-if="!imgLoading"
+                transition="dialog-bottom-transition"
+                max-width="700"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    color="primary"
+                    small
+                    :class="$vuetify.breakpoint.mobile ? 'mt-2' : 'ml-2'"
+                  >Утилизировать</v-btn>
+                </template>
+                <template v-slot:default="dialog">
+                  <v-card>
+                    <v-card-title>Уверены что хотите утилизировать?</v-card-title>
+                    <v-card-actions>
+                      <v-btn
+                        color="error"
+                        small
+                        @click="dialog.value = false"
+                      >Нет</v-btn>
+                      <v-btn
+                        color="primary"
+                        small
+                        @click="$store.dispatch('disposalSetById', item.id).then(() => listOfData(), dialog.value = false, close())"
+                      >Да</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </template>
+              </v-dialog>
+              <v-dialog
+                v-if="!imgLoading && imagesSrc.id !== 'local'"
+                transition="dialog-bottom-transition"
+                max-width="700"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    v-bind="attrs"
+                    v-on="on"
+                    color="primary"
+                    small
+                    :class="$vuetify.breakpoint.mobile ? 'mt-2' : 'ml-2'"
+                  >Удалить картинку</v-btn>
+                </template>
+                <template v-slot:default="dialog">
+                  <v-card>
+                    <v-card-title>Уверены что хотите удалить?</v-card-title>
+                    <v-card-actions>
+                      <v-btn
+                        color="error"
+                        small
+                        @click="dialog.value = false"
+                      >Нет</v-btn>
+                      <v-btn
+                        color="primary"
+                        small
+                        @click="$store.dispatch('deleteImages', item.id).then(() => listOfData(), dialog.value = false, close())"
+                      >Да</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </template>
+              </v-dialog>
+            </div>
+
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <useTable
+        :headers="headers"
+        :loading="loading"
+        :items="filteredItems"
+        :filters="filters"
+        :function='getTest'
+      />
+
+    </div>
   </div>
 </template>
 
 <script>
-import { mdiArrowLeft, mdiCheckBold, mdiDeleteCircle } from '@mdi/js'
+import { mdiArrowLeft, mdiCheckBold, mdiClose, mdiDelete, mdiDeleteCircle } from '@mdi/js'
 import { admin, coordinator, florist, operator, superUser, workshop } from '@/helpers/roles'
 import dateRangePicker from '@/layouts/components/dateRangePicker/DateRangePicker'
+import useTable from '@/components/useDashboard/useTable'
 
 export default {
   name: 'SellTable',
-  components: {dateRangePicker},
+  components: {dateRangePicker, useTable},
   data:() => ({
+    item: {},
     items: [],
     imagesSrc: [],
-    icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft},
+    icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft, mdiClose, mdiDelete},
     loading: false,
+    imgLoading: false,
+    dialog: false,
     sellLoading: false,
     searchText: '',
     selectCase: '',
+    headers:[
+      {text: '№', value: 'index'},
+      {text: 'Название', value: 'name'},
+      {text: 'Сделано', value: 'createdBy'},
+      {text: 'Статус', value: 'status'},
+      {text: 'Бронирован', value: 'orderedBy'},
+      {text: 'Дата создания', value: 'createdAt'},
+      { text: 'Действие', value: 'function' },
+    ],
+    filters: {
+      date: ['createdAt']
+    }
   }),
   mounted() {
     this.$store.state.branch.departmentIds.map(i => {
@@ -202,37 +305,41 @@ export default {
       this.loading = true
       this.$store.dispatch('getAllSoldSets', id)
         .then(r => {
-          this.items.push(...r.data)
-          r.data.map(i => {
-            this.image(i.id)
-          })
+          this.items = r.data
           this.loading = false
         })
     },
     image(v){
+      this.imgLoading = true
       this.$store.dispatch('getImages', v)
         .then(r => {
           if (r.data.byteLength > 4) {
             const blob = new Blob([r.data], { type: 'image/jpeg' });
-            const item = {
+            this.imagesSrc = {
               id: v,
               img: URL.createObjectURL(blob)
             }
-            this.imagesSrc.push(item)
           } else {
-            const item = {
-              id: v,
+            this.imagesSrc = {
+              id: 'local',
               img: 'https://media.istockphoto.com/id/157643364/photo/tumble-of-strawberries.jpg?s=1024x1024&w=is&k=20&c=RLsC4rSKQ8Gfj8rHK9HqYe2SWDLzW5C1PkFM_lLwRc4='
             }
-            this.imagesSrc.push(item)
           }
-
+          this.imgLoading = false
         })
         .catch(error => {
           const errorMessage = error.response ? error.response.data : 'Unknown error';
           this.$store.commit('setSnackbars', errorMessage);
+          this.imgLoading = false
         });
     },
+    getTest(d) {
+      this.item = d
+      this.dialog = true
+    },
+    close() {
+      this.dialog = false
+    }
   }
 }
 </script>

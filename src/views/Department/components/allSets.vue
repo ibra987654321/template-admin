@@ -24,41 +24,60 @@
     </div>
 
     <div class="">
-      <v-dialog v-model='dialog' max-width="400">
-<!--        <v-card>-->
-<!--          <v-card-title class="d-flex justify-space-between" >-->
-<!--            Набор-->
-<!--          </v-card-title>-->
+      <v-dialog v-model='dialog' :max-width="$vuetify.breakpoint.mobile ? 400 : 600 ">
           <v-card
             :loading="loading"
             elevation="7"
           >
-            <v-img
+            <v-icon
+              large
+              @click='dialog = false'
+              style="
+              position: absolute;
+              z-index: 10;
+              right: 0;
+
+            " >{{icons.mdiClose}}</v-icon>
+            <v-dialog
               v-if="!imgLoading"
-              :src="imagesSrc.img"
-              height="200px"
-              width="100%"
-            ></v-img>
+              transition="dialog-bottom-transition"
+              max-width="700"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-img
+                  :src="imagesSrc.img"
+                  height="200px"
+                  width="100%"
+                  v-bind="attrs"
+                  v-on="on"
+                  style="cursor:pointer;"
+                >
+                </v-img>
+              </template>
+              <template v-slot:default="dialog">
+
+                <v-img
+                  :src="imagesSrc.img"
+                  width="100%"
+                  max-height="100%"
+                >
+                  <v-icon
+                    large
+                    @click='dialog.value = false'
+                    style="
+                  position: absolute;
+                  z-index: 10;
+                  right: 0;
+
+            " >{{icons.mdiClose}}</v-icon>
+                </v-img>
+              </template>
+            </v-dialog>
             <v-skeleton-loader
               v-else
               :width="$vuetify.breakpoint.sm ? 233 : $vuetify.breakpoint.mobile ? '100%' : 300"
               type="card-avatar"
             ></v-skeleton-loader>
-<!--            <v-fab-transition v-if="!loading">-->
-<!--              <v-btn-->
-<!--                v-show="hover"-->
-<!--                color="pink"-->
-<!--                fab-->
-<!--                dark-->
-<!--                small-->
-<!--                absolute-->
-<!--                top-->
-<!--                right-->
-<!--                @click="$store.dispatch('deleteImages', item.id).then(() => listOfData())"-->
-<!--              >-->
-<!--                <v-icon>{{ icons.mdiDeleteCircle }}</v-icon>-->
-<!--              </v-btn>-->
-<!--            </v-fab-transition>-->
             <v-card-text class="mt-4" v-if="!loading">
               <div class="d-flex align-center justify-space-between">
                 <div class="d-flex">
@@ -112,16 +131,77 @@
               <!--            <createDialog :prop-item="item" text-btn="Изменить" @success="listOfData"/>-->
               <div class="mt-4 mr-2 " style="min-width: 118px; max-width: 118px">{{item.createdAt | date}}</div>
               <v-spacer></v-spacer>
-              <v-btn class="rounded"  rounded small color="primary" :loading="sellLoading" :disabled="item.sold || workshop" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
-              <bookDialog v-if="!workshop" :item="item" @success="listOfData"/>
-              <v-btn color='error' text @click='dialog = false'>Закрыть</v-btn>
+              <div class="flex-grow-1">
+                <v-btn class="rounded"  rounded small color="primary" :loading="sellLoading" :disabled="item.sold || workshop" @click="saveToSell(item.id)">{{item.sold ? 'Продано' : 'Продать'}}</v-btn>
+                <bookDialog v-if="!workshop" :item="item" @success="listOfData"/>
+                <v-dialog
+                  v-if="!imgLoading"
+                  transition="dialog-bottom-transition"
+                  max-width="700"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-bind="attrs"
+                      v-on="on"
+                      color="primary"
+                      small
+                      :class="$vuetify.breakpoint.mobile ? 'mt-2' : 'ml-2'"
+                    >Утилизировать</v-btn>
+                  </template>
+                  <template v-slot:default="dialog">
+                    <v-card>
+                      <v-card-title>Уверены что хотите утилизировать?</v-card-title>
+                      <v-card-actions>
+                        <v-btn
+                          color="error"
+                          small
+                          @click="dialog.value = false"
+                        >Нет</v-btn>
+                        <v-btn
+                          color="primary"
+                          small
+                          @click="$store.dispatch('disposalSetById', item.id).then(() => listOfData(), dialog.value = false, close())"
+                        >Да</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+                <v-dialog
+                  v-if="!imgLoading && imagesSrc.id !== 'local'"
+                  transition="dialog-bottom-transition"
+                  max-width="700"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-bind="attrs"
+                      v-on="on"
+                      color="primary"
+                      small
+                      :class="$vuetify.breakpoint.mobile ? 'mt-2' : 'ml-2'"
+                    >Удалить картинку</v-btn>
+                  </template>
+                  <template v-slot:default="dialog">
+                    <v-card>
+                      <v-card-title>Уверены что хотите удалить?</v-card-title>
+                      <v-card-actions>
+                        <v-btn
+                          color="error"
+                          small
+                          @click="dialog.value = false"
+                        >Нет</v-btn>
+                        <v-btn
+                          color="primary"
+                          small
+                          @click="$store.dispatch('deleteImages', item.id).then(() => listOfData(), dialog.value = false, close())"
+                        >Да</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </template>
+                </v-dialog>
+              </div>
+
             </v-card-actions>
           </v-card>
-<!--          <v-card-actions>-->
-<!--            <v-spacer></v-spacer>-->
-<!--            <v-btn color='blue darken-1' text @click='close'>Закрыть</v-btn>-->
-<!--          </v-card-actions>-->
-<!--        </v-card>-->
       </v-dialog>
       <useTable
         :headers="headers"
@@ -137,7 +217,7 @@
 </template>
 
 <script>
-import { mdiArrowLeft, mdiCheckBold, mdiDeleteCircle } from '@mdi/js'
+import { mdiArrowLeft, mdiCheckBold, mdiDeleteCircle, mdiClose, mdiDelete } from '@mdi/js'
 import createDialog from '@/views/Department/components/createDialog'
 import bookDialog from '@/views/Department/components/bookDialog'
 import useTable from '@/components/useDashboard/useTable'
@@ -157,7 +237,7 @@ export default {
     items: [],
     item: {},
     imagesSrc: '',
-    icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft},
+    icons: {mdiCheckBold, mdiDeleteCircle, mdiArrowLeft, mdiClose, mdiDelete},
     loading: false,
     imgLoading: false,
     dialog: false,
@@ -240,7 +320,7 @@ export default {
             }
           } else {
             this.imagesSrc = {
-              id: v,
+              id: 'local',
               img: 'https://media.istockphoto.com/id/157643364/photo/tumble-of-strawberries.jpg?s=1024x1024&w=is&k=20&c=RLsC4rSKQ8Gfj8rHK9HqYe2SWDLzW5C1PkFM_lLwRc4='
             }
           }
@@ -268,6 +348,9 @@ export default {
     getTest(d) {
      this.item = d
       this.dialog = true
+    },
+    close() {
+      this.dialog = false
     }
   }
 }
